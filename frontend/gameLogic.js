@@ -87,9 +87,12 @@ export const handleDeath = (data) => {
 
   localStorage.setItem("lastScore", Math.floor(gameState.playerScore));
 
+  const canvas = document.getElementById("gameCanvas");
+  if (canvas) {
+    canvas.classList.add("blured");
+  }
+
   setTimeout(() => {
     window.location.href = "index.html";
   }, 2000);
-
-  // todo: gradual blur
 };

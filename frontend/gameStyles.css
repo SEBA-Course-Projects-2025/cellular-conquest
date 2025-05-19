@@ -69,6 +69,11 @@
   justify-content: center;
   gap: 10px;
 }
+#blur {
+  backdrop-filter: blur(5px);
+  background-color: #0007;
+  z-index: 1;
+}
 
 .popupContent {
   z-index: 2;
@@ -81,8 +86,10 @@
 .hidden {
   display: none !important;
 }
-.blur {
-  backdrop-filter: blur(5px);
-  background-color: #0007;
-  z-index: 1;
+
+#gameCanvas {
+  transition: filter 1.8s ease-out;
+}
+.blured {
+  filter: blur(5px);
 }
