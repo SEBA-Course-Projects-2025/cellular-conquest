@@ -1,4 +1,4 @@
-import { sendInput } from "./gameCommunication.js";
+import { sendInput, sendSplitMessage } from "./gameCommunication.js";
 import gameState from "./gameState.js";
 
 export const canvas = document.getElementById("gameCanvas");
@@ -143,6 +143,8 @@ export function handleKeyDown(event) {
     gameState.inactive = !gameState.inactive;
     if (gameState.inactive) exitPopup.classList.remove("hidden");
     else exitPopup.classList.add("hidden");
+  } else if (event.key === " ") {
+    sendSplitMessage();
   }
 }
 

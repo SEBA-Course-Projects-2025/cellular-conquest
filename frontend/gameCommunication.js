@@ -89,3 +89,13 @@ export const sendLeaveMessage = () => {
     );
   }
 };
+
+export const sendSplitMessage = () => {
+  if (gameState.connected && socket.readyState === WebSocket.OPEN) {
+    socket.send(
+      JSON.stringify({
+        type: "split",
+      })
+    );
+  }
+};
