@@ -9,6 +9,9 @@ export const leaderboardList = document.getElementById("leaderboardList");
 export const exitPopup = document.getElementById("exitPopup");
 export const cancelExitBtn = document.getElementById("cancelExit");
 export const confirmExitBtn = document.getElementById("confirmExit");
+let currentScale = gameState.camera.scale;
+let lastRenderTime = performance.now();
+const lerp = (start, end, t) => start + (end - start) * t;
 
 export const resizeCanvas = () => {
   canvas.width = window.innerWidth;
@@ -22,7 +25,20 @@ export const render = () => {
   ctx.save();
 
   ctx.translate(canvas.width / 2, canvas.height / 2);
-  ctx.scale(gameState.camera.scale, gameState.camera.scale);
+  const now = performance.now();
+  const deltaTime = (now - lastRenderTime) / 1000;
+  lastRenderTime = now;
+
+  const smoothingSpeed = 5;
+  if (Math.abs(currentScale - gameState.camera.scale) > 0.001) {
+    currentScale = lerp(
+      currentScale,
+      gameState.camera.scale,
+      1 - Math.exp(-smoothingSpeed * deltaTime)
+    );
+  }
+
+  ctx.scale(currentScale, currentScale);
   ctx.translate(-gameState.camera.x, -gameState.camera.y);
 
   drawGrid();
