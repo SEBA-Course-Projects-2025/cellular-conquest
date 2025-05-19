@@ -33,7 +33,14 @@ export const render = () => {
 
   for (const player of gameState.players) {
     for (const cell of player.cells) {
-      drawCircle(cell.x, cell.y, cell.radius, cell.color);
+      drawWavyBlob(
+        cell.x,
+        cell.y,
+        cell.radius,
+        cell.color,
+        Date.now(),
+        player.id
+      );
     }
 
     if (player.cells.length > 0) {
@@ -140,3 +147,73 @@ export const hideExitPopup = () => {
   exitPopup.classList.add("hidden");
   gameState.inactive = false;
 };
+
+const blobCache = new Map();
+
+function getMiddlePoint(p1, p2) {
+  return {
+    x: (p1.x + p2.x) / 2,
+    y: (p1.y + p2.y) / 2,
+  };
+}
+
+function drawWavyBlob(x, y, radius, color, timestamp, blobId) {
+  const points = Math.max(8, Math.min(16, Math.floor(radius / 10)));
+  const wobbleAmount = radius * 0.04;
+  const wobbleSpeed = 0.008;
+
+  let controlPoints = blobCache.get(blobId);
+
+  if (!controlPoints) {
+    controlPoints = [];
+    const angleStep = (Math.PI * 2) / points;
+
+    for (let i = 0; i < points; i++) {
+      const angle = i * angleStep;
+      const phaseOffset = Math.random() * Math.PI * 2;
+
+      controlPoints.push({
+        baseX: Math.cos(angle),
+        baseY: Math.sin(angle),
+        phaseOffset: phaseOffset,
+        wobbleFreq: 0.9 + Math.random() * 0.2,
+      });
+    }
+
+    blobCache.set(blobId, controlPoints);
+  }
+
+  for (let i = 0; i < controlPoints.length; i++) {
+    const point = controlPoints[i];
+
+    const wobble =
+      Math.sin(timestamp * wobbleSpeed * point.wobbleFreq + point.phaseOffset) *
+      wobbleAmount;
+    const adjustedRadius = radius + wobble;
+
+    point.x = x + adjustedRadius * point.baseX;
+    point.y = y + adjustedRadius * point.baseY;
+  }
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+
+  if (controlPoints.length > 0) {
+    const firstMidpoint = getMiddlePoint(
+      controlPoints[controlPoints.length - 1],
+      controlPoints[0]
+    );
+    ctx.moveTo(firstMidpoint.x, firstMidpoint.y);
+
+    for (let i = 0; i < controlPoints.length; i++) {
+      const current = controlPoints[i];
+      const next = controlPoints[(i + 1) % controlPoints.length];
+      const midPoint = getMiddlePoint(current, next);
+
+      ctx.quadraticCurveTo(current.x, current.y, midPoint.x, midPoint.y);
+    }
+  }
+
+  ctx.closePath();
+  ctx.fill();
+}
