@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cellular conquest</title>
+    <link rel="stylesheet" href="gameStyles.css" />
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameInfo" class="allScreen">
+      <div id="playerInfo" class="styledDiv">
+        <h5 id="playerName">Nickname</h5>
+        <div id="playerScore">Score: 0</div>
+      </div>
+      <div id="leaderboard" class="styledDiv">
+        <h3>Leaderboard</h3>
+        <div id="leaderboardList">
+          <ol>
+            <li>Someone</li>
+            <li>Other</li>
+            <li>Another</li>
+            <li>Nick</li>
+            <li>Name</li>
+            <li>Six</li>
+            <li>Seven</li>
+            <li>Eight</li>
+            <li>Prelast</li>
+            <li>Last</li>
+
+            <li value="54" class="special">Nickname</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div id="exitPopup" class="allScreen hidden">
+      <div class="blur allScreen"></div>
+      <div class="popupContent styledDiv">
+        <h2>Exit Game?</h2>
+        <p>Are you sure you want to return to the main menu?</p>
+        <div class="exitButtons">
+          <button id="cancelExit">Cancel</button>
+          <button id="confirmExit">Exit Game</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
