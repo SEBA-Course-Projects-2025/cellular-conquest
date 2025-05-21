@@ -13,7 +13,6 @@ public class Game
 {
     private ConcurrentDictionary<Guid, Player> visiblePlayers = new();
     private HttpListener httpListener = new();
-    private Timer gameLoopTimer;
     private List<Food> foodItems = new();
     private Random rng = new();
     private const int WorldWidth = 2000;
@@ -70,7 +69,12 @@ public class Game
                             Id = Guid.NewGuid(),
                             Nickname = obj?["nickname"]?.ToString() ?? "Anonymous",
                             Socket = webSocket,
-                            Position = new Vector2(500, 500), 
+                            Cells = new List<Cell> {
+                                new Cell {
+                                    Position = new Vector2(500, 500),
+                                    Radius = 20f
+                                }
+                            }, 
                             Direction = Vector2.Zero,
                             Score = 0
                         };
@@ -96,6 +100,30 @@ public class Game
                         break;
 
                     case "split":
+                        if (player != null && player.Cells.Count < 16)
+                        {
+                            var newCells = new List<Cell>();
+                            foreach (var cell in player.Cells)
+                            {
+                                if (cell.Radius > 10f) 
+                                {
+                                    var splitRadius = cell.Radius / 1.414f; 
+                                    var direction = Vector2.Normalize(player.Direction == Vector2.Zero ? new Vector2(1, 0) : player.Direction);
+                                    var offset = direction * (splitRadius + 2);
+
+                                    newCells.Add(new Cell
+                                    {
+                                        Position = cell.Position + offset,
+                                        Radius = splitRadius,
+                                        Velocity = direction * 200 
+                                    });
+
+                                    cell.Position -= offset;
+                                    cell.Radius = splitRadius;
+                                }
+                            }
+                            player.Cells.AddRange(newCells);
+                        }
                         break;
 
                     case "leave":
@@ -126,20 +154,29 @@ public class Game
 
         foreach (var player in visiblePlayers.Values)
         {
-            player.Position += player.Direction * PlayerSpeed * deltaTime;
-            
-            player.Position = Vector2.Clamp(player.Position, Vector2.Zero, new Vector2(WorldWidth, WorldHeight));
+            foreach (var cell in player.Cells)
+            {
+                cell.Position += player.Direction * PlayerSpeed * deltaTime;
+                cell.Position = Vector2.Clamp(cell.Position, Vector2.Zero, new Vector2(WorldWidth, WorldHeight));
+                
+                cell.Position += cell.Velocity * deltaTime;
+                cell.Velocity *= 0.9f;
+            }      
         }
         
         foreach (var player in visiblePlayers.Values)
         {
             var eaten = new List<Food>();
-            foreach (var food in foodItems)
+            foreach (var cell in player.Cells)
             {
-                if (Vector2.Distance(player.Position, food.Position) < 20f)
+                foreach (var food in foodItems)
                 {
-                    player.Score += 10;
-                    eaten.Add(food);
+                    if (Vector2.Distance(cell.Position, food.Position) < cell.Radius)
+                    {
+                        player.Score += 10;
+                        eaten.Add(food);
+                        break;
+                    }
                 }
             }
 
@@ -168,14 +205,12 @@ public class Game
             id = p.Id,
             nickname = p.Nickname,
             score = p.Score,
-            cells = new[] {
-                new {
-                    x = p.Position.X,
-                    y = p.Position.Y,
-                    radius = 20 + p.Score / 10f,
-                    color = "#3d78dd"
-                }
-            }
+            cells = p.Cells.Select(c => new {
+                x = c.Position.X,
+                y = c.Position.Y,
+                radius = c.Radius,
+                color = "#3d78dd"
+            }).ToList()
         }).ToList();
 
         var gameState = new
@@ -197,6 +232,7 @@ public class Game
             }
         }
     }
+
     private void SpawnFood(int count)
     {
         for (int i = 0; i < count; i++)
@@ -208,6 +244,8 @@ public class Game
                 Color = "#3dda83"
             });
         }
+    }
+
     private async Task SendJson(WebSocket socket, object data)
     {
         if (socket.State != WebSocketState.Open) return;
