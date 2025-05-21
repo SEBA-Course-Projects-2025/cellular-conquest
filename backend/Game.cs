@@ -175,6 +175,12 @@ public class Game
                     {
                         player.Score += 10;
                         eaten.Add(food);
+                        
+                        float currentArea = MathF.PI * cell.Radius * cell.Radius;
+                        float foodArea = MathF.PI * food.Radius * food.Radius;
+                        float newArea = currentArea + foodArea;
+                        cell.Radius = MathF.Sqrt(newArea / MathF.PI);
+                        
                         break;
                     }
                 }
