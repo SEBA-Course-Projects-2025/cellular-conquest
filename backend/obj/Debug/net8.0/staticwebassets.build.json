@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "EzfgajieCSGNORjINZ+Rmge7262twVMQcWgVJQm6K8E=",
+  "Hash": "xyOY7rK5ovp1tVlV/fa3R55WbxT+XvwJVbgRVxr3emI=",
   "Source": "CellularConquestBackend",
   "BasePath": "_content/CellularConquestBackend",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

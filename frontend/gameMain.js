@@ -27,7 +27,7 @@ const init = () => {
 const exitGame = () => {
   localStorage.setItem("lastScore", Math.floor(gameState.playerScore));
   sendLeaveMessage();
-  window.location.href = "index.html";
+  window.location.href = "web.html";
 };
 
 init();

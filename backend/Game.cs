@@ -19,6 +19,7 @@ public class Game
     private const int WorldWidth = 2000;
     private const int WorldHeight = 2000;
     private const float PlayerSpeed = 150f;
+    private Timer? gameLoopTimer;
 
     public async Task StartServer()
     {
@@ -67,7 +68,7 @@ public class Game
                         player = new Player
                         {
                             Id = Guid.NewGuid(),
-                            Nickname = obj["nickname"]?.ToString() ?? "Anonymous",
+                            Nickname = obj?["nickname"]?.ToString() ?? "Anonymous",
                             Socket = webSocket,
                             Position = new Vector2(500, 500), 
                             Direction = Vector2.Zero,
@@ -88,8 +89,8 @@ public class Game
                     case "input":
                         if (player != null)
                         {
-                            float x = obj["direction"]?["x"]?.GetValue<float>() ?? 0f;
-                            float y = obj["direction"]?["y"]?.GetValue<float>() ?? 0f;
+                            float x = obj?["direction"]?["x"]?.GetValue<float>() ?? 0f;
+                            float y = obj?["direction"]?["y"]?.GetValue<float>() ?? 0f;
                             player.Direction = new Vector2(x, y);
                         }
                         break;
@@ -117,7 +118,7 @@ public class Game
 
         if (player != null)
             visiblePlayers.TryRemove(player.Id, out _);
-            Console.WriteLine($"Player {player.Nickname} disconnected.");
+            Console.WriteLine($"Player {player?.Nickname} disconnected.");
     }
    private async void SendGameState(object? state)
     {
@@ -207,8 +208,6 @@ public class Game
                 Color = "#3dda83"
             });
         }
-    }
-
     private async Task SendJson(WebSocket socket, object data)
     {
         if (socket.State != WebSocketState.Open) return;
