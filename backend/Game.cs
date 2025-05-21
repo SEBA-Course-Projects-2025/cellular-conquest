@@ -79,12 +79,25 @@ public class Game
                         break;
 
                     case "input":
+                        if (player != null)
+                        {
+                            float x = obj["direction"]?["x"]?.GetValue<float>() ?? 0f;
+                            float y = obj["direction"]?["y"]?.GetValue<float>() ?? 0f;
+                            player.Direction = new Vector2(x, y);
+                        }
                         break;
 
                     case "split":
                         break;
 
                     case "leave":
+                        if (player != null)
+                        {
+                            visiblePlayers.TryRemove(player.Id, out _);
+                            Console.WriteLine($"Player {player.Nickname} left the game.");
+                        }
+
+                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Player left", CancellationToken.None);
                         return;
                 }
             }
@@ -96,8 +109,8 @@ public class Game
         }
 
         if (player != null)
-            visiblePlayers
-    .TryRemove(player.Id, out _);
+            visiblePlayers.TryRemove(player.Id, out _);
+            Console.WriteLine($"Player {player.Nickname} disconnected.");
     }
 
     private async void SendGameState(object? state)
