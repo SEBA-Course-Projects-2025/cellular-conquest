@@ -14,12 +14,19 @@ public class Game
     private ConcurrentDictionary<Guid, Player> visiblePlayers = new();
     private HttpListener httpListener = new();
     private Timer gameLoopTimer;
+    private List<Food> foodItems = new();
+    private Random rng = new();
+    private const int WorldWidth = 2000;
+    private const int WorldHeight = 2000;
+    private const float PlayerSpeed = 150f;
 
     public async Task StartServer()
     {
         httpListener.Prefixes.Add("http://localhost:8080/");
         httpListener.Start();
         Console.WriteLine("Server started on ws://localhost:8080");
+        
+        SpawnFood(100);
 
         gameLoopTimer = new Timer(SendGameState, null, 0, 1000 / 60);
 
@@ -112,10 +119,94 @@ public class Game
             visiblePlayers.TryRemove(player.Id, out _);
             Console.WriteLine($"Player {player.Nickname} disconnected.");
     }
-
-    private async void SendGameState(object? state)
+   private async void SendGameState(object? state)
     {
+        var deltaTime = 1f / 60f;
+
+        foreach (var player in visiblePlayers.Values)
+        {
+            player.Position += player.Direction * PlayerSpeed * deltaTime;
+            
+            player.Position = Vector2.Clamp(player.Position, Vector2.Zero, new Vector2(WorldWidth, WorldHeight));
+        }
         
+        foreach (var player in visiblePlayers.Values)
+        {
+            var eaten = new List<Food>();
+            foreach (var food in foodItems)
+            {
+                if (Vector2.Distance(player.Position, food.Position) < 20f)
+                {
+                    player.Score += 10;
+                    eaten.Add(food);
+                }
+            }
+
+            foreach (var food in eaten)
+            {
+                foodItems.Remove(food);
+                foodItems.Add(new Food
+                {
+                    Position = new Vector2(rng.Next(0, WorldWidth), rng.Next(0, WorldHeight)),
+                    Radius = 5f,
+                    Color = "#3dda83"
+                });
+            }
+        }
+
+        var visibleFood = foodItems.Select(f => new
+        {
+            x = f.Position.X,
+            y = f.Position.Y,
+            radius = f.Radius,
+            color = f.Color
+        }).ToList();
+
+        var visiblePlayersList = visiblePlayers.Values.Select(p => new
+        {
+            id = p.Id,
+            nickname = p.Nickname,
+            score = p.Score,
+            cells = new[] {
+                new {
+                    x = p.Position.X,
+                    y = p.Position.Y,
+                    radius = 20 + p.Score / 10f,
+                    color = "#3d78dd"
+                }
+            }
+        }).ToList();
+
+        var gameState = new
+        {
+            type = "gameState",
+            timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            visiblePlayers = visiblePlayersList,
+            visibleFood = visibleFood
+        };
+
+        var json = JsonSerializer.Serialize(gameState);
+        var buffer = Encoding.UTF8.GetBytes(json);
+
+        foreach (var player in visiblePlayers.Values)
+        {
+            if (player.Socket.State == WebSocketState.Open)
+            {
+                await player.Socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+        }
+    }
+    private void SpawnFood(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            foodItems.Add(new Food
+            {
+                Position = new Vector2(rng.Next(0, WorldWidth), rng.Next(0, WorldHeight)),
+                Radius = 5f,
+                Color = "#3dda83"
+            });
+        }
     }
 
     private async Task SendJson(WebSocket socket, object data)
