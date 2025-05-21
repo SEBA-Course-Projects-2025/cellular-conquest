@@ -96,6 +96,6 @@ export const handleDeath = (data) => {
   }
 
   setTimeout(() => {
-    window.location.href = "index.html";
+    window.location.href = "web.html";
   }, 2000);
 };
