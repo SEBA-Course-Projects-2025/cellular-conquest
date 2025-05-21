@@ -134,3 +134,45 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Ignore .NET build output
+bin/
+obj/
+
+# Ignore user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore build results
+*.dll
+*.exe
+*.pdb
+*.app
+*.cache
+*.mdb
+
+# VSCode config
+.vscode/
+
+# Rider IDE config
+.idea/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Backup & log files
+*.log
+*.bak
+*.old
+*.orig
+
+# Visual Studio Code workspace file
+*.code-workspace
+
+# JetBrains Rider / ReSharper
+*.DotSettings.user
+
+# dotCover
+*.dotCover
