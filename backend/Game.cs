@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 public class Game
 {
-    private ConcurrentDictionary<Guid, Player> players = new();
+    private ConcurrentDictionary<Guid, Player> visiblePlayers = new();
     private HttpListener httpListener = new();
     private Timer gameLoopTimer;
 
@@ -55,6 +56,26 @@ public class Game
                 switch (type)
                 {
                     case "join":
+                        //Console.WriteLine("new player has joined");
+                        player = new Player
+                        {
+                            Id = Guid.NewGuid(),
+                            Nickname = obj["nickname"]?.ToString() ?? "Anonymous",
+                            Socket = webSocket,
+                            Position = new Vector2(500, 500), 
+                            Direction = Vector2.Zero,
+                            Score = 0
+                        };
+                        visiblePlayers
+                        [player.Id] = player;
+
+                        var joinResponse = new
+                        {
+                            type = "playerData",
+                            id = player.Id,
+                            nickname = player.Nickname
+                        };
+                        await SendJson(webSocket, joinResponse);
                         break;
 
                     case "input":
@@ -75,7 +96,8 @@ public class Game
         }
 
         if (player != null)
-            players.TryRemove(player.Id, out _);
+            visiblePlayers
+    .TryRemove(player.Id, out _);
     }
 
     private async void SendGameState(object? state)
