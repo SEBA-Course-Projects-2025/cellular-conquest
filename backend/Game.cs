@@ -13,7 +13,7 @@ public class Game
 {
     private ConcurrentDictionary<Guid, Player> visiblePlayers = new();
     private HttpListener httpListener = new();
-    private Timer gameLoopTimer;
+    private Timer? gameLoopTimer;
 
     public async Task StartServer()
     {
@@ -60,7 +60,7 @@ public class Game
                         player = new Player
                         {
                             Id = Guid.NewGuid(),
-                            Nickname = obj["nickname"]?.ToString() ?? "Anonymous",
+                            Nickname = obj?["nickname"]?.ToString() ?? "Anonymous",
                             Socket = webSocket,
                             Position = new Vector2(500, 500), 
                             Direction = Vector2.Zero,
@@ -81,8 +81,8 @@ public class Game
                     case "input":
                         if (player != null)
                         {
-                            float x = obj["direction"]?["x"]?.GetValue<float>() ?? 0f;
-                            float y = obj["direction"]?["y"]?.GetValue<float>() ?? 0f;
+                            float x = obj?["direction"]?["x"]?.GetValue<float>() ?? 0f;
+                            float y = obj?["direction"]?["y"]?.GetValue<float>() ?? 0f;
                             player.Direction = new Vector2(x, y);
                         }
                         break;
@@ -110,12 +110,11 @@ public class Game
 
         if (player != null)
             visiblePlayers.TryRemove(player.Id, out _);
-            Console.WriteLine($"Player {player.Nickname} disconnected.");
+            Console.WriteLine($"Player {player?.Nickname} disconnected.");
     }
 
-    private async void SendGameState(object? state)
+    private void SendGameState(object? state)
     {
-        
     }
 
     private async Task SendJson(WebSocket socket, object data)

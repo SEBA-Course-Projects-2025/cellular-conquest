@@ -460,19 +460,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\kovko\\.nuget\\packages\\": {}
+    "C:\\Users\\Кирило\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kovko\\Coursework\\cellular-conquest1\\backend\\CellularConquestBackend.csproj",
+      "projectUniqueName": "C:\\Users\\Кирило\\cellular-conquest1\\backend\\CellularConquestBackend.csproj",
       "projectName": "CellularConquestBackend",
-      "projectPath": "C:\\Users\\kovko\\Coursework\\cellular-conquest1\\backend\\CellularConquestBackend.csproj",
-      "packagesPath": "C:\\Users\\kovko\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kovko\\Coursework\\cellular-conquest1\\backend\\obj\\",
+      "projectPath": "C:\\Users\\Кирило\\cellular-conquest1\\backend\\CellularConquestBackend.csproj",
+      "packagesPath": "C:\\Users\\Кирило\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Кирило\\cellular-conquest1\\backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\kovko\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Кирило\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -490,7 +490,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -524,7 +530,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
