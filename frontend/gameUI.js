@@ -91,7 +91,7 @@ export const drawText = (text, x, y, size, color) => {
 };
 
 // todo: update protocol to include worldSize as PlayerData
-export const drawGrid = (worldSize = { width: 2000, height: 2000 }) => {
+export const drawGrid = () => {
   const gridSize = 50;
   const lineColor = "rgb(15, 66, 85)";
 
@@ -121,19 +121,19 @@ export const drawGrid = (worldSize = { width: 2000, height: 2000 }) => {
 
   // vertical lines
   for (let x = startX; x <= endX; x += gridSize) {
-    if (x < 0 || x > worldSize.width) continue;
+    if (x < 0 || x > gameState.worldSize.width) continue;
     ctx.beginPath();
     ctx.moveTo(x, Math.max(0, startY));
-    ctx.lineTo(x, Math.min(worldSize.height, endY));
+    ctx.lineTo(x, Math.min(gameState.worldSize.height, endY));
     ctx.stroke();
   }
 
   // horizontal lines
   for (let y = startY; y <= endY; y += gridSize) {
-    if (y < 0 || y > worldSize.height) continue;
+    if (y < 0 || y > gameState.worldSize.height) continue;
     ctx.beginPath();
     ctx.moveTo(Math.max(0, startX), y);
-    ctx.lineTo(Math.min(worldSize.width, endX), y);
+    ctx.lineTo(Math.min(gameState.worldSize.width, endX), y);
     ctx.stroke();
   }
 };

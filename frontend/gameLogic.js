@@ -17,6 +17,9 @@ export const gameLoop = () => {
 export const handlePlayerData = (data) => {
   gameState.playerId = data.id;
   gameState.playerName = data.nickname;
+  if (data.width !== undefined) gameState.worldSize.width = data.width;
+  if (data.height !== undefined) gameState.worldSize.height = data.height;
+
   playerNameElement.textContent = gameState.playerName;
 
   console.log(`Joined as ${gameState.playerName} (ID: ${gameState.playerId})`);
