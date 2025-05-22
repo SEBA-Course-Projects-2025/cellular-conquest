@@ -1,0 +1,10 @@
+| **Message Type** | **Direction** | **When Sent** | **Payload Format** | **Description & Details** |
+| --- | --- | --- | --- | --- |
+| join | Client → Server | Once, when the player connects and starts a session | { "type": "join","nickname": "PlayerName","mode"?: "FFA" } | "Death Match" |
+| playerData | Server → Client | After a valid join request. Only sent to the joining client | { "type": "playerData", "id": "UUID", "nickname": "PlayerName", "width": number, "height": number } | Confirms successful join, sends back unique ID and nickname for reference. |
+| input | Client → Server | Whenever user moves the mouse | { "type": "input", "direction":{ "x": number,"y": number } } | Informs server of new movement direction vector. Note that for multiple blobs of the same player angle of movement may be different |
+| split | Client → Server | On keypress (e.g., spacebar) | { "type": "split" } | Triggers a “split” action (e.g., a blob divides and shoots forward). Needs special implementation on the server. |
+| leave | Client → Server | On intentional player quit | { "type": "leave" } | Notifies the server that the player is leaving the game. |
+| gameState | Server → Client | Every ~16ms (~60 FPS) | { "type": "gameState", "visiblePlayers": [{ id: player.id,score: player.score,cells: x: number,y: number,radius: number,color: "rgb(number, number, number)" } ] }], "fvisibleFod": [{ x: food.position.x,y: food.position.y,radius: food.radius,color: food.color }],"timestamp": number } | Broadcasts visible world state: player blobs, food positions, etc. Clients should extract their own blob data from the players list by matching their ID. |
+| death | Server → Client | When a player dies | { "type": "death", "score": number } | Informs the client of their death and final score. |
+| leaderboard | Server → Client | Every 1 second | { "type": "leaderboard", "topPlayers": [{ "nickname": string, "score": number }], "personal": { "rank": number, "score": number } } | Contains current top player data and the recipient’s personal rank and score. |
