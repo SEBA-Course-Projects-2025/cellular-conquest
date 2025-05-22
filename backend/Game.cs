@@ -151,6 +151,7 @@ public class Game
    private async void SendGameState(object? state)
     {
         var deltaTime = 1f / 60f;
+        var eatenCells = new List<(Player victim, Cell cell)>();
 
         foreach (var player in visiblePlayers.Values)
         {
@@ -195,6 +196,43 @@ public class Game
                     Radius = 5f,
                     Color = "#3dda83"
                 });
+            }
+        }
+        
+        foreach (var hunter in visiblePlayers.Values)
+        {
+            foreach (var prey in visiblePlayers.Values)
+            {
+                if (hunter.Id == prey.Id) continue; 
+
+                foreach (var hunterCell in hunter.Cells)
+                {
+                    foreach (var preyCell in prey.Cells)
+                    {
+                        float distance = Vector2.Distance(hunterCell.Position, preyCell.Position);
+                        if (hunterCell.Radius > preyCell.Radius * 1.1f && distance < hunterCell.Radius)
+                        {
+                            float hunterArea = MathF.PI * hunterCell.Radius * hunterCell.Radius;
+                            float preyArea = MathF.PI * preyCell.Radius * preyCell.Radius;
+                            float newArea = hunterArea + preyArea;
+                            hunterCell.Radius = MathF.Sqrt(newArea / MathF.PI);
+                            hunter.Score += (int)(preyCell.Radius); 
+
+                            eatenCells.Add((prey, preyCell));
+                        }
+                    }
+                }
+            }
+        }
+        
+        foreach (var (victim, cell) in eatenCells)
+        {
+            victim.Cells.Remove(cell);
+
+            if (victim.Cells.Count == 0)
+            {
+                visiblePlayers.TryRemove(victim.Id, out _);
+                Console.WriteLine($"{victim.Nickname} was eaten.");
             }
         }
 
