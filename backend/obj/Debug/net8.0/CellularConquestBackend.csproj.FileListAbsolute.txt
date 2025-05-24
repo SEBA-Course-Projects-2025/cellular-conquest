@@ -32,13 +32,13 @@ C:\Users\kovko\Coursework\cellular-conquest1\backend\obj\Debug\net8.0\refint\Cel
 C:\Users\kovko\Coursework\cellular-conquest1\backend\obj\Debug\net8.0\CellularConquestBackend.pdb
 C:\Users\kovko\Coursework\cellular-conquest1\backend\obj\Debug\net8.0\CellularConquestBackend.genruntimeconfig.cache
 C:\Users\kovko\Coursework\cellular-conquest1\backend\obj\Debug\net8.0\ref\CellularConquestBackend.dll
+C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.exe
+C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.dll
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\appsettings.json
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.staticwebassets.endpoints.json
-C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.exe
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.deps.json
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.runtimeconfig.json
-C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.dll
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\CellularConquestBackend.pdb
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Кирило\cellular-conquest1\backend\bin\Debug\net8.0\Microsoft.OpenApi.dll

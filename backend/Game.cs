@@ -22,7 +22,7 @@ public class Game
 
     public async Task StartServer()
     {
-        httpListener.Prefixes.Add("http://localhost:8080/");
+        httpListener.Prefixes.Add("http://0.0.0.0:8080/");
         httpListener.Start();
         Console.WriteLine("Server started on ws://localhost:8080");
         
@@ -270,7 +270,7 @@ public class Game
 
         foreach (var player in visiblePlayers.Values)
         {
-            if (player.Socket.State == WebSocketState.Open)
+            if (player?.Socket?.State == WebSocketState.Open)
             {
                 await player.Socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
             }
