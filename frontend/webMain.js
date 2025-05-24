@@ -69,6 +69,15 @@ document.addEventListener("DOMContentLoaded", function () {
       this.classList.add("active");
       selectedMode = this.dataset.mode;
       playSound("click");
+
+      if (selectedMode === "ffa") {
+        const nicknameValue = nicknameInput.value.trim() || document.querySelector(".nick").textContent;
+        if (!nicknameValue || nicknameValue === "Nickname") {
+          alert("Please enter a nickname and click Join Game first!");
+          return;
+        }
+        window.location.href = `gamePage.html?nickname=${encodeURIComponent(nicknameValue)}`;
+      }
     });
   });
 
