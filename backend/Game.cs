@@ -21,24 +21,35 @@ public class Game
     private Timer? gameLoopTimer;
 
     public async Task StartServer()
+{
+    try
     {
+        httpListener.Prefixes.Add("http://*:8080/");
         httpListener.Prefixes.Add("http://0.0.0.0:8080/");
+        httpListener.Prefixes.Add("http://localhost:8080/");
         httpListener.Start();
-        Console.WriteLine("Server started on ws://localhost:8080");
-        
-        SpawnFood(100);
-
-        gameLoopTimer = new Timer(SendGameState, null, 0, 1000 / 60);
-
-        while (true)
-        {
-            var context = await httpListener.GetContextAsync();
-            if (context.Request.IsWebSocketRequest)
-                _ = HandleConnection(context);
-            else
-                context.Response.StatusCode = 400;
-        }
+        Console.WriteLine("Server started on ws://0.0.0.0:8080");
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine("FAILED TO START SERVER: " + ex.Message);
+        return;
+    }
+
+    SpawnFood(100);
+
+    gameLoopTimer = new Timer(SendGameState, null, 0, 1000 / 60);
+
+    while (true)
+    {
+        var context = await httpListener.GetContextAsync();
+        if (context.Request.IsWebSocketRequest)
+            _ = HandleConnection(context);
+        else
+            context.Response.StatusCode = 400;
+    }
+}
+
 
     private async Task HandleConnection(HttpListenerContext context)
     {
