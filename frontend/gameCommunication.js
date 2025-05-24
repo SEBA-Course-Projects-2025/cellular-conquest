@@ -6,7 +6,7 @@ import {
 } from "./gameLogic.js";
 import gameState from "./gameState.js";
 
-const ENDPOINT = `ws://${location.host}/ws`;  
+const ENDPOINT = "ws://localhost:8080/ws"; 
 let socket;
 
 export const connectToServer = () => {
