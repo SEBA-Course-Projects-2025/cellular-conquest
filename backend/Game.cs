@@ -24,11 +24,9 @@ public class Game
 {
     try
     {
-        httpListener.Prefixes.Add("http://*:8080/");
-        httpListener.Prefixes.Add("http://0.0.0.0:8080/");
-        httpListener.Prefixes.Add("http://localhost:8080/");
+        httpListener.Prefixes.Add("http://+:8080/");
         httpListener.Start();
-        Console.WriteLine("Server started on ws://0.0.0.0:8080");
+        Console.WriteLine("Server started on ws://+:8080");
     }
     catch (Exception ex)
     {
@@ -49,6 +47,7 @@ public class Game
             context.Response.StatusCode = 400;
     }
 }
+
 
 
     private async Task HandleConnection(HttpListenerContext context)
