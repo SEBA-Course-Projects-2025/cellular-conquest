@@ -1,0 +1,141 @@
+using System;
+using System.Numerics;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
+
+public partial class Game {
+    private async void SendGameState(object? state)
+    {
+        var deltaTime = 1f / 60f;
+        var eatenCells = new List<(Player victim, Cell cell)>();
+
+        foreach (var player in visiblePlayers.Values)
+        {
+            foreach (var cell in player.Cells)
+            {
+                cell.Position += player.Direction * PlayerSpeed * deltaTime;
+                cell.Position = Vector2.Clamp(cell.Position, Vector2.Zero, new Vector2(WorldWidth, WorldHeight));
+                
+                cell.Position += cell.Velocity * deltaTime;
+                cell.Velocity *= 0.9f;
+            }      
+        }
+        
+        foreach (var player in visiblePlayers.Values)
+        {
+            var eaten = new List<Food>();
+            foreach (var cell in player.Cells)
+            {
+                foreach (var food in foodItems)
+                {
+                    if (Vector2.Distance(cell.Position, food.Position) < cell.Radius)
+                    {
+                        player.Score += 10;
+                        eaten.Add(food);
+                        
+                        float currentArea = MathF.PI * cell.Radius * cell.Radius;
+                        float foodArea = MathF.PI * food.Radius * food.Radius;
+                        float newArea = currentArea + foodArea;
+                        cell.Radius = MathF.Sqrt(newArea / MathF.PI);
+                        
+                        break;
+                    }
+                }
+            }
+
+            foreach (var food in eaten)
+            {
+                foodItems.Remove(food);
+                foodItems.Add(new Food
+                {
+                    Position = new Vector2(rng.Next(0, WorldWidth), rng.Next(0, WorldHeight)),
+                    Radius = 5f,
+                    Color = "#3dda83"
+                });
+            }
+        }
+        
+        foreach (var hunter in visiblePlayers.Values)
+        {
+            foreach (var prey in visiblePlayers.Values)
+            {
+                if (hunter.Id == prey.Id) continue; 
+
+                foreach (var hunterCell in hunter.Cells)
+                {
+                    foreach (var preyCell in prey.Cells)
+                    {
+                        float distance = Vector2.Distance(hunterCell.Position, preyCell.Position);
+                        if (hunterCell.Radius > preyCell.Radius * 1.1f && distance < hunterCell.Radius)
+                        {
+                            float hunterArea = MathF.PI * hunterCell.Radius * hunterCell.Radius;
+                            float preyArea = MathF.PI * preyCell.Radius * preyCell.Radius;
+                            float newArea = hunterArea + preyArea;
+                            hunterCell.Radius = MathF.Sqrt(newArea / MathF.PI);
+                            hunter.Score += (int)(preyCell.Radius); 
+
+                            eatenCells.Add((prey, preyCell));
+                        }
+                    }
+                }
+            }
+        }
+        
+        foreach (var (victim, cell) in eatenCells)
+        {
+            victim.Cells.Remove(cell);
+
+            if (victim.Cells.Count == 0)
+            {
+                visiblePlayers.TryRemove(victim.Id, out _);
+                Console.WriteLine($"{victim.Nickname} was eaten.");
+            }
+        }
+
+        var visibleFood = foodItems.Select(f => new
+        {
+            x = f.Position.X,
+            y = f.Position.Y,
+            radius = f.Radius,
+            color = f.Color
+        }).ToList();
+
+        var visiblePlayersList = visiblePlayers.Values.Select(p => new
+        {
+            id = p.Id,
+            nickname = p.Nickname,
+            score = p.Score,
+            cells = p.Cells.Select(c => new {
+                x = c.Position.X,
+                y = c.Position.Y,
+                radius = c.Radius,
+                color = "#3d78dd"
+            }).ToList()
+        }).ToList();
+
+        var gameState = new
+        {
+            type = "gameState",
+            timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            visiblePlayers = visiblePlayersList,
+            visibleFood = visibleFood
+        };
+
+        var json = JsonSerializer.Serialize(gameState);
+        var buffer = Encoding.UTF8.GetBytes(json);
+
+        foreach (var player in visiblePlayers.Values)
+        {
+            if (player.Socket.State == WebSocketState.Open)
+            {
+                await player.Socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+        }
+    }
+}
