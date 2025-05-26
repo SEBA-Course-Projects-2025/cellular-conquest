@@ -15,6 +15,8 @@ public partial class Game {
         var deltaTime = 1f / 60f;
         var eatenCells = new List<(Player victim, Cell cell)>();
 
+
+        //cell movements
         foreach (var player in visiblePlayers.Values)
         {
             foreach (var cell in player.Cells)
@@ -27,6 +29,8 @@ public partial class Game {
             }      
         }
         
+
+        //eaten food by cells
         foreach (var player in visiblePlayers.Values)
         {
             var eaten = new List<Food>();
@@ -49,6 +53,7 @@ public partial class Game {
                 }
             }
 
+            //remove eaten food, add new
             foreach (var food in eaten)
             {
                 foodItems.Remove(food);
@@ -61,6 +66,7 @@ public partial class Game {
             }
         }
         
+        //handling cell VS cell
         foreach (var hunter in visiblePlayers.Values)
         {
             foreach (var prey in visiblePlayers.Values)
@@ -72,7 +78,8 @@ public partial class Game {
                     foreach (var preyCell in prey.Cells)
                     {
                         float distance = Vector2.Distance(hunterCell.Position, preyCell.Position);
-                        if (hunterCell.Radius > preyCell.Radius * 1.1f && distance < hunterCell.Radius)
+                        if ((hunterCell.Radius > preyCell.Radius * 1.1f && distance < hunterCell.Radius && hunter.Cells.Count() == 1)
+                        || (hunterCell.Radius > preyCell.Radius * 1.33f && distance < hunterCell.Radius && hunter.Cells.Count() > 1))
                         {
                             float hunterArea = MathF.PI * hunterCell.Radius * hunterCell.Radius;
                             float preyArea = MathF.PI * preyCell.Radius * preyCell.Radius;
@@ -87,12 +94,22 @@ public partial class Game {
             }
         }
         
+        //check who ate who, remove the pray
         foreach (var (victim, cell) in eatenCells)
         {
             victim.Cells.Remove(cell);
 
             if (victim.Cells.Count == 0)
             {
+                var deathMessage = new {
+                    type = "death",
+                    score = victim.Score,
+                };
+                
+                if (victim.Socket.State == WebSocketState.Open) {
+                    await SendJson(victim.Socket, deathMessage);
+                }
+
                 visiblePlayers.TryRemove(victim.Id, out _);
                 Console.WriteLine($"{victim.Nickname} was eaten.");
             }
@@ -119,6 +136,8 @@ public partial class Game {
             }).ToList()
         }).ToList();
 
+
+        //write gameState
         var gameState = new
         {
             type = "gameState",
