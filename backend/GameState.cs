@@ -40,11 +40,12 @@ public partial class Game {
                 {
                     if (Vector2.Distance(cell.Position, food.Position) < cell.Radius)
                     {
-                        player.Score += 10;
                         eaten.Add(food);
                         
                         float currentArea = MathF.PI * cell.Radius * cell.Radius;
                         float foodArea = MathF.PI * food.Radius * food.Radius;
+                        int points = (int)(foodArea / 10f);
+                        player.Score += points;
                         float newArea = currentArea + foodArea;
                         cell.Radius = MathF.Sqrt(newArea / MathF.PI);
                         
@@ -85,8 +86,9 @@ public partial class Game {
                             float preyArea = MathF.PI * preyCell.Radius * preyCell.Radius;
                             float newArea = hunterArea + preyArea;
                             hunterCell.Radius = MathF.Sqrt(newArea / MathF.PI);
-                            hunter.Score += (int)(preyCell.Radius); 
-
+                            int points = (int)(preyArea / 17f);
+                            hunter.Score += points;
+                            prey.Score = (prey.Score - points) < 0 ? 0 : prey.Score - points;
                             eatenCells.Add((prey, preyCell));
                         }
                     }
@@ -98,6 +100,7 @@ public partial class Game {
         foreach (var (victim, cell) in eatenCells)
         {
             victim.Cells.Remove(cell);
+            
 
             if (victim.Cells.Count == 0)
             {
