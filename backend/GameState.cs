@@ -86,7 +86,7 @@ public partial class Game {
                             float preyArea = MathF.PI * preyCell.Radius * preyCell.Radius;
                             float newArea = hunterArea + preyArea;
                             hunterCell.Radius = MathF.Sqrt(newArea / MathF.PI);
-                            int points = (int)(preyArea / 17f);
+                            int points = (int)(preyArea / 35f);
                             hunter.Score += points;
                             prey.Score = (prey.Score - points) < 0 ? 0 : prey.Score - points;
                             eatenCells.Add((prey, preyCell));
@@ -109,9 +109,9 @@ public partial class Game {
                     score = victim.Score,
                 };
                 
-                if (victim.Socket.State == WebSocketState.Open) {
-                    await SendJson(victim.Socket, deathMessage);
-                }
+                
+                await SendJson(victim, deathMessage);
+                
 
                 visiblePlayers.TryRemove(victim.Id, out _);
                 Console.WriteLine($"{victim.Nickname} was eaten.");
@@ -149,15 +149,10 @@ public partial class Game {
             visibleFood = visibleFood
         };
 
-        var json = JsonSerializer.Serialize(gameState);
-        var buffer = Encoding.UTF8.GetBytes(json);
 
         foreach (var player in visiblePlayers.Values)
         {
-            if (player.Socket.State == WebSocketState.Open)
-            {
-                await player.Socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-            }
+            await SendJson(player, gameState);
         }
     }
 }

@@ -19,7 +19,7 @@ public partial class Game
     private const int WorldHeight = 2000;
     private const float PlayerSpeed = 150f;
     private Timer? gameLoopTimer;
-    // private Timer? leaderboardTimer;
+    private Timer? leaderboardTimer;
 
 
     public async Task StartServer()
@@ -32,6 +32,7 @@ public partial class Game
         SpawnFood(100);
 
         gameLoopTimer = new Timer(SendGameState, null, 0, 1000 / 60);
+        leaderboardTimer = new Timer(async _ => await SendLeaderboardAsync(), null, 0, 1000); // every 1s
 
         while (true)
         {
@@ -56,12 +57,59 @@ public partial class Game
         }
     }
 
-    private async Task SendJson(WebSocket socket, object data)
+    private async Task SendLeaderboardAsync()
     {
-        if (socket.State != WebSocketState.Open) return;
+        var playersList = visiblePlayers.Values.ToList();
+        
+        var topPlayers = playersList
+            .OrderByDescending(p => p.Score)
+            .Take(10)
+            .Select(p => new {
+                nickname = p.Nickname,
+                score = p.Score
+            }).ToList();
 
+        foreach (var player in playersList) {
+            if (player.Socket?.State != WebSocketState.Open)
+                continue;
+
+            int rank = playersList
+                .OrderByDescending(p => p.Score)
+                .ToList()
+                .FindIndex(p => p.Id == player.Id) + 1;
+
+            var leaderboard = new {
+                type = "leaderboard",
+                topPlayers = topPlayers,
+                personal = new
+                {
+                    rank = rank,
+                    score = player.Score
+                }
+            };
+
+            try {
+                await SendJson(player, leaderboard);
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"Error sending leaderboard to {player.Nickname}: {ex.Message}");
+            }
+        }
+    }
+
+
+    private async Task SendJson(Player player, object data) {
         var json = JsonSerializer.Serialize(data);
-        var bytes = Encoding.UTF8.GetBytes(json);
-        await socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+        var buffer = Encoding.UTF8.GetBytes(json);
+
+        await player.SendLock.WaitAsync();
+        try {
+            if (player.Socket != null && player.Socket.State == WebSocketState.Open) {
+                await player.Socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+        }
+        finally {
+            player.SendLock.Release();
+        }
     }
 }

@@ -52,13 +52,14 @@ public partial class Game
                         visiblePlayers
                         [player.Id] = player;
 
+                        //send playerData
                         var joinResponse = new
                         {
                             type = "playerData",
                             id = player.Id,
                             nickname = player.Nickname
                         };
-                        await SendJson(webSocket, joinResponse);
+                        await SendJson(player, joinResponse);
                         break;
 
                     case "input":

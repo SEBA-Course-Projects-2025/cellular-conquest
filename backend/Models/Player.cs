@@ -10,4 +10,5 @@ public class Player
     public List<Cell> Cells { get; set; } = new();
     public Vector2 Direction { get; set; } = Vector2.Zero;
     public int Score { get; set; } = 0;
+    public SemaphoreSlim SendLock = new SemaphoreSlim(1, 1);
 }
