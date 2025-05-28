@@ -19,10 +19,13 @@ public partial class Game
     private const int WorldHeight = 2000;
     private const float PlayerSpeed = 150f;
     private Timer? gameLoopTimer;
+    // private Timer? leaderboardTimer;
+
 
     public async Task StartServer()
     {
-        httpListener.Prefixes.Add("http://localhost:8080/");
+        // httpListener.Prefixes.Add("http://localhost:8080/");
+        httpListener.Prefixes.Add("http://+:8080/");
         httpListener.Start();
         Console.WriteLine("Server started on ws://localhost:8080");
         
