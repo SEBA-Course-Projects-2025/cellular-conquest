@@ -57,24 +57,15 @@ export const render = () => {
         Date.now(),
         player.id
       );
-    }
 
-    if (player.cells.length > 0) {
-      const cell = player.cells[0];
-      drawText(
-        player.nickname,
-        cell.x,
-        cell.y,
-        16 / gameState.camera.scale,
-        "white"
-      );
+      drawText(player.nickname, cell.x, cell.y, cell.radius, "white");
     }
   }
 
   ctx.restore();
 };
 
-export const drawCircle = (x, y, radius, fillColor, borderColor) => {
+const drawCircle = (x, y, radius, fillColor, borderColor) => {
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fillStyle = fillColor;
@@ -83,14 +74,50 @@ export const drawCircle = (x, y, radius, fillColor, borderColor) => {
   ctx.stroke();
 };
 
-export const drawText = (text, x, y, size, color) => {
-  ctx.font = `${size}px Inter`;
-  ctx.fillStyle = color;
+function drawRoundedRect(x, y, width, height, radius, fillStyle) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+}
+
+const drawText = (text, x, y, radius, color) => {
+  const fontSize = Math.max(10, Math.min(radius * 0.8, 24));
+  ctx.font = `${fontSize}px Inter`;
   ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  const padding = 4;
+  const textMetrics = ctx.measureText(text);
+  const textWidth = textMetrics.width + padding * 2;
+  const textHeight = fontSize + padding * 2;
+  const rectX = x - textWidth / 2;
+  const rectY = y - textHeight / 2;
+  const borderRadius = textHeight / 2;
+
+  drawRoundedRect(
+    rectX,
+    rectY,
+    textWidth,
+    textHeight,
+    borderRadius,
+    "rgba(0, 0, 0, 0.5)"
+  );
+
+  ctx.fillStyle = color;
   ctx.fillText(text, x, y);
 };
 
-export const drawGrid = () => {
+const drawGrid = () => {
   const gridSize = 50;
   const lineColor = "rgb(15, 66, 85)";
 
