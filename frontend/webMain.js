@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".wrapper").style.display = "none";
   const loginScreen = document.getElementById("loginScreen");
   const nicknameInput = document.getElementById("nicknameInput");
+  if (localStorage.getItem("playerName")) {
+    nicknameInput.placeholder = localStorage.getItem("playerName");
+  }
   const loginBtn = document.getElementById("loginBtn");
   let socket = null;
   let nickname = "";
@@ -14,12 +17,13 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function tryLogin() {
-    nickname = nicknameInput.value.trim();
+    nickname = nicknameInput.value.trim() || localStorage.getItem("playerName");
     if (!nickname) {
       alert("Please enter a nickname!");
       nicknameInput.focus();
       return;
     }
+    localStorage.setItem("playerName", nickname);
     startGame(nickname);
   }
 
