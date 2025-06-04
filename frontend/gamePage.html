@@ -31,14 +31,36 @@
         </ol>
       </div>
     </div>
-    <div id="exitPopup" class="allScreen hidden">
-      <div id="blur" class="allScreen"></div>
+    <div id="exitPopup" class="allScreen hidden fadeIn">
+      <div class="blur allScreen"></div>
       <div class="popupContent styledDiv">
         <h2>Exit Game?</h2>
         <p>Are you sure you want to return to the main menu?</p>
         <div class="exitButtons">
           <button id="cancelExit" class="btn">Cancel</button>
           <button id="confirmExit" class="btn">Exit Game</button>
+        </div>
+      </div>
+    </div>
+    <div id="deathPopup" class="allScreen hidden fadeIn">
+      <div class="blur allScreen"></div>
+      <div class="popupContent styledDiv">
+        <h2>Game Over</h2>
+        <p>Your final score: <span id="finalScore">0</span></p>
+        <p id="autoCloseNotice" class="hidden">
+          Returning to main menu in <span id="countdown">10</span>s...
+        </p>
+        <div class="exitButtons">
+          <button id="restartGame" onclick="location.reload()" class="btn">
+            Play Again
+          </button>
+          <button
+            id="returnMenu"
+            onclick="location.href = 'web.html'"
+            class="btn"
+          >
+            Main Menu
+          </button>
         </div>
       </div>
     </div>
