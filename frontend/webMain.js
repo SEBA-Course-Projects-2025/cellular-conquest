@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function getWsHost() {
     const isLocal = location.hostname === "localhost"
       || location.hostname.startsWith("192.168.")
-      || location.hostname === "127.0.0.1";
+      || location.hostname === "127.0.0.1"
     return isLocal
       ? location.hostname + ":8080"
       : "161.35.75.14:8080";
