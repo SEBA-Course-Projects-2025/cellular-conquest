@@ -116,10 +116,7 @@
         }
       ],
       "abilities"?: {
-        "speed": {
-          "points": number,
-          "active": boolean
-        }
+        "speed": number (0 - 5)
       }
     }
   ],

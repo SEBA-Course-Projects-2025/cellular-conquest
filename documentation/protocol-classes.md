@@ -24,14 +24,8 @@ classDiagram
     }
 
     class Abilities {
-        +Speed speed
+        +number speed
     }
-
-    class Speed {
-        +number points
-        +boolean active
-    }
-
     class Direction {
         +number x
         +number y
@@ -62,7 +56,6 @@ classDiagram
     Food --|> Cell
     Player *-- Cell
     Player *-- Abilities
-    Abilities *-- Speed
     GameState o-- Player
     GameState o-- Food
     Leaderboard *-- LeaderboardEntry
