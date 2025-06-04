@@ -6,9 +6,16 @@ const ctx = canvas.getContext("2d");
 export const playerNameElement = document.getElementById("playerName");
 export const playerScoreElement = document.getElementById("playerScore");
 export const leaderboardList = document.getElementById("leaderboardList");
-export const exitPopup = document.getElementById("exitPopup");
+
+const exitPopup = document.getElementById("exitPopup");
 export const cancelExitBtn = document.getElementById("cancelExit");
 export const confirmExitBtn = document.getElementById("confirmExit");
+
+const deathPopup = document.getElementById("deathPopup");
+const finalScoreSpan = document.getElementById("finalScore");
+const restartGameBtn = document.getElementById("restartGame");
+const returnMenuBtn = document.getElementById("returnMenu");
+
 let currentScale = gameState.camera.scale;
 let lastRenderTime = performance.now();
 const lerp = (start, end, t) => start + (end - start) * t;
@@ -172,6 +179,12 @@ export function handleKeyDown(event) {
   } else if (event.key === " ") {
     sendSplitMessage();
   }
+}
+
+export function showDeathPopup(score) {
+  finalScoreSpan.textContent = score;
+  deathPopup.classList.remove("hidden");
+  gameState.inactive = true;
 }
 
 export const handleMouseMove = (event) => {

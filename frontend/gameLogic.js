@@ -3,6 +3,7 @@ import {
   leaderboardList,
   playerNameElement,
   playerScoreElement,
+  showDeathPopup,
   render,
 } from "./gameUI.js";
 
@@ -95,7 +96,33 @@ export const handleDeath = (data) => {
     canvas.classList.add("blured");
   }
 
-  setTimeout(() => {
-    window.location.href = "web.html";
-  }, 2000);
+  showDeathPopup(data.score);
+  const inactivityDelay = 30000;
+  const countdownSeconds = 10;
+
+  let inactivityTimer = setTimeout(() => {
+    const notice = document.getElementById("autoCloseNotice");
+    const countdown = document.getElementById("countdown");
+    let timeLeft = countdownSeconds;
+
+    notice.classList.remove("hidden");
+
+    const interval = setInterval(() => {
+      timeLeft--;
+      countdown.textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        location.href = "web.html";
+      }
+    }, 1000);
+
+    document.querySelectorAll("#deathPopup button").forEach((btn) =>
+      btn.addEventListener("click", () => {
+        clearTimeout(inactivityTimer);
+        clearInterval(interval);
+        notice.classList.add("hidden");
+      })
+    );
+  }, inactivityDelay);
 };
