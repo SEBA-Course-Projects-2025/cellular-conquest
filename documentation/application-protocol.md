@@ -15,10 +15,13 @@
     <pre><code>{
   "type": "join",
   "nickname": "PlayerName",
-  "mode"?: "FFA" | "Death Match" | "Teams" | "Other"
+  "mode"?: "FFA" | "Death Match" | "Teams" | "Other",
+  "privateServer"?: true | UUID
 }</code></pre>
   </td>
-  <td>Registers a new player in the game. Client can request a specific game mode.</td>
+  <td>Registers a new player in the game. Client can request a specific game mode.
+    <br/><span style="color:#d4ac0d"><b>🧪 Beta:</b></span> The <code>private</code> flag enables creation or joining of a private server. If an <code>id</code> is provided, attempts to join it; otherwise, a new room will be created.
+  </td>
 </tr>
 
 <tr>
@@ -31,10 +34,13 @@
   "id": "UUID",
   "nickname": "PlayerName",
   "width": number,
-  "height": number
+  "height": number,
+  "roomId": UUID
 }</code></pre>
   </td>
-  <td>Confirms successful join, sends back unique ID and nickname for reference.</td>
+  <td>Confirms successful join, sends back unique ID and nickname for reference.
+    <br/><span style="color:#d4ac0d"><b>🧪 Beta:</b></span> Return <code>roomId</code> so it can be displayed to players.
+  </td>
 </tr>
 
 <tr>
@@ -66,7 +72,7 @@
 </tr>
 
 <tr>
-  <td><code><b>🧪 speedup</b></code></td>
+  <td><code><span style="color:#d4ac0d">speedup</span></code></td>
   <td>Client → Server</td>
   <td>On key down and key up of speed key (e.g., Shift)</td>
   <td>
@@ -75,7 +81,7 @@
   "active": boolean
 }</code></pre>
   </td>
-  <td><b>🧪 Beta Feature:</b> Requests temporary speed boost. "active: true" starts the boost, "false" stops it. Server validates & consumes points.</td>
+  <td><span style="color:#d4ac0d"><b>🧪 Beta:</b></span> Requests temporary speed boost. "active: true" starts the boost, "false" stops it. Server validates & consumes points.</td>
 </tr>
 
 <tr>
@@ -109,12 +115,12 @@
           "color": "rgb(...)"
         }
       ],
-      <b>"abilities"?: {
+      "abilities"?: {
         "speed": {
           "points": number,
           "active": boolean
         }
-      }</b>
+      }
     }
   ],
   "visibleFood": [
@@ -123,14 +129,16 @@
       "y": number,
       "radius": number,
       "color": number,
-      <b>"type"?: "normal" | "speed" | "shield" | "unknown"</b>
+      "type"?: "normal" | "speed" | "shield" | "unknown"
     }
   ],
-"timestamp": number
+  "timestamp": number
 }</code></pre>
-
   </td>
-  <td>World state. 🧪 <b>Beta:</b> Optional <code>abilities</code> field may appear for players with special powers (e.g., speed boost). And for food, field <code>type</code> will show whether the food grants special abilities when eaten</td>
+  <td>World state updates.
+    <br/><span style="color:#d4ac0d"><b>🧪 Beta:</b></span> Optional <code>abilities</code> field appears for players with special powers (e.g., speed boost).
+    <br/><span style="color:#d4ac0d"><b>🧪 Beta:</b></span> <code>type</code> in food shows if it grants special effects.
+  </td>
 </tr>
 
 <tr>
