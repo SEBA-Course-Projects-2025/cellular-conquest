@@ -5,8 +5,12 @@ import {
   handlePlayerData,
 } from "./gameLogic.js";
 import gameState from "./gameState.js";
+const isLocalhost =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1";
+const ENDPOINT = isLocalhost
+  ? "ws://localhost:8080"
+  : "ws://161.35.75.14:8080/ws";
 
-const ENDPOINT = "ws://161.35.75.14:8080/ws"; 
 let socket;
 
 export const connectToServer = () => {
@@ -97,5 +101,11 @@ export const sendSplitMessage = () => {
         type: "split",
       })
     );
+  }
+};
+
+export const sendSpeedup = () => {
+  if (gameState.connected && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: "speedup" }));
   }
 };

@@ -77,8 +77,7 @@
   <td>On key down and key up of speed key (e.g., Shift)</td>
   <td>
     <pre><code>{
-  "type": "speedup",
-  "active": boolean
+  "type": "speedup"
 }</code></pre>
   </td>
   <td><span style="color:#d4ac0d"><b>🧪 Beta:</b></span> Requests temporary speed boost. "active: true" starts the boost, "false" stops it. Server validates & consumes points.</td>
