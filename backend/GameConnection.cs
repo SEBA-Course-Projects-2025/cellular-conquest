@@ -69,6 +69,14 @@ public partial class Game
                             float y = obj?["direction"]?["y"]?.GetValue<float>() ?? 0f;
                             player.Direction = new Vector2(x, y);
                         }
+
+                        foreach (var cell in player.Cells) {
+                                float speed = 170f / (cell.Radius / 10f); // Larger radius → slower cell
+                                Vector2 dir = Vector2.Normalize(player.Direction);
+                                if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
+
+                                cell.Velocity = dir * speed;
+                            }
                         break;
 
                     case "split":
