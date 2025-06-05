@@ -5,12 +5,49 @@ document.addEventListener("DOMContentLoaded", function () {
   const loginScreen = document.getElementById("loginScreen");
   const nicknameInput = document.getElementById("nicknameInput");
   const loginBtn = document.getElementById("loginBtn");
+  
+  const roomCodeModal = document.getElementById("roomCodeModal");
+  const closeModal = document.getElementById("closeModal");
+  const createRoomBtn = document.getElementById("createRoomBtn");
+  const joinRoomBtn = document.getElementById("joinRoomBtn");
+  const roomCodeInput = document.getElementById("roomCodeInput");
+  const createdRoomInfo = document.getElementById("createdRoomInfo");
+  const displayRoomCode = document.getElementById("displayRoomCode");
+  const copyCodeBtn = document.getElementById("copyCodeBtn");
+  const startGameBtn = document.getElementById("startGameBtn");
+  
   let socket = null;
   let nickname = "";
+  let currentRoomId = null;
 
   loginBtn.addEventListener("click", tryLogin);
   nicknameInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") tryLogin();
+  });
+
+  closeModal.addEventListener("click", () => {
+    roomCodeModal.style.display = "none";
+    resetModal();
+  });
+
+  window.addEventListener("click", (event) => {
+    if (event.target === roomCodeModal) {
+      roomCodeModal.style.display = "none";
+      resetModal();
+    }
+  });
+
+  createRoomBtn.addEventListener("click", createRoom);
+  joinRoomBtn.addEventListener("click", joinRoom);
+  copyCodeBtn.addEventListener("click", copyRoomCode);
+  startGameBtn.addEventListener("click", startTeamsGame);
+
+  roomCodeInput.addEventListener("input", (e) => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  });
+
+  roomCodeInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") joinRoom();
   });
 
   function tryLogin() {
@@ -44,25 +81,140 @@ document.addEventListener("DOMContentLoaded", function () {
     socket.addEventListener("open", () => {
       socket.send(JSON.stringify({ type: "join", nickname: nick }));
     });
+    
     socket.addEventListener("message", (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "playerData") {
+        if (data.roomId) {
+          currentRoomId = data.roomId;
+        }
       } else if (data.type === "gameState") {
         updateGameState(data.visiblePlayers || data.players || []);
+      } else if (data.type === "roomCreated") {
+        handleRoomCreated(data.roomId);
+      } else if (data.type === "roomJoined") {
+        handleRoomJoined(data.roomId);
+      } else if (data.type === "error") {
+        alert(data.message || "An error occurred");
       }
     });
+    
     socket.addEventListener("close", () => {
       alert("Disconnected from server");
       location.reload();
     });
+    
     socket.addEventListener("error", (err) => {
       alert("WebSocket error!");
       console.error(err);
     });
   }
 
+  function showRoomModal() {
+    if (!nickname) {
+      alert("Please enter a nickname and join the game first!");
+      return;
+    }
+    roomCodeModal.style.display = "flex";
+  }
+
+  function resetModal() {
+    createdRoomInfo.style.display = "none";
+    roomCodeInput.value = "";
+    displayRoomCode.textContent = "";
+    currentRoomId = null;
+  }
+
+  function createRoom() {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      alert("Not connected to server!");
+      return;
+    }
+
+    socket.send(JSON.stringify({
+      type: "join",
+      nickname: nickname,
+      mode: "Teams",
+      privateServer: true
+    }));
+  }
+
+  function joinRoom() {
+    const roomCode = roomCodeInput.value.trim();
+    if (!roomCode) {
+      alert("Please enter a room code!");
+      roomCodeInput.focus();
+      return;
+    }
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      alert("Not connected to server!");
+      return;
+    }
+
+    socket.send(JSON.stringify({
+      type: "join",
+      nickname: nickname,
+      mode: "Teams",
+      privateServer: roomCode
+    }));
+  }
+
+  function handleRoomCreated(roomId) {
+    currentRoomId = roomId;
+    displayRoomCode.textContent = roomId.substring(0, 8).toUpperCase();
+    createdRoomInfo.style.display = "block";
+    playSound("success");
+  }
+
+  function handleRoomJoined(roomId) {
+    currentRoomId = roomId;
+    roomCodeModal.style.display = "none";
+    resetModal();
+    playSound("success");
+    alert("Successfully joined the room!");
+  }
+
+  function copyRoomCode() {
+    const code = displayRoomCode.textContent;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(() => {
+        copyCodeBtn.textContent = "Copied!";
+        setTimeout(() => {
+          copyCodeBtn.textContent = "Copy";
+        }, 2000);
+      });
+    } else {
+      const textArea = document.createElement("textarea");
+      textArea.value = code;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      copyCodeBtn.textContent = "Copied!";
+      setTimeout(() => {
+        copyCodeBtn.textContent = "Copy";
+      }, 2000);
+    }
+    playSound("click");
+  }
+
+  function startTeamsGame() {
+    if (!currentRoomId) {
+      alert("No room selected!");
+      return;
+    }
+    
+    roomCodeModal.style.display = "none";
+    resetModal();
+    
+    window.location.href = `gamePage.html?nickname=${encodeURIComponent(nickname)}&mode=teams&roomId=${currentRoomId}`;
+  }
+
   const modeButtons = document.querySelectorAll(".mode-btn");
   let selectedMode = "ffa";
+  
   modeButtons.forEach((button) => {
     button.addEventListener("click", function () {
       modeButtons.forEach((btn) => btn.classList.remove("active"));
@@ -77,6 +229,8 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
         window.location.href = `gamePage.html?nickname=${encodeURIComponent(nicknameValue)}`;
+      } else if (selectedMode === "teams") {
+        showRoomModal();
       }
     });
   });
@@ -107,6 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.querySelector(".wrapper").style.display = "none";
       loginScreen.style.display = "block";
       nicknameInput.value = "";
+      resetModal();
     }
   });
 
