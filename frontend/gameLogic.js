@@ -5,6 +5,7 @@ import {
   playerScoreElement,
   showDeathPopup,
   render,
+  updateSpeedBar,
 } from "./gameUI.js";
 
 export const gameLoop = () => {
@@ -18,6 +19,7 @@ export const gameLoop = () => {
 export const handlePlayerData = (data) => {
   gameState.playerId = data.id;
   gameState.playerName = data.nickname;
+  gameState.roomId = data.roomId;
   if (data.width !== undefined) gameState.worldSize.width = data.width;
   if (data.height !== undefined) gameState.worldSize.height = data.height;
 
@@ -38,6 +40,7 @@ export const handleGameState = (data) => {
     playerScoreElement.textContent = `Score: ${Math.floor(
       gameState.playerScore
     )}`;
+    updateSpeedBar(player.abilities?.speed ?? 0);
 
     if (player.cells.length > 0) {
       let centerX = 0,

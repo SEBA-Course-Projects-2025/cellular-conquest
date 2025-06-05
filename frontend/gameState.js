@@ -4,6 +4,7 @@ const state = {
   playerName: localStorage.getItem("playerName") || "YourNickname",
   playerId: null,
   playerScore: 0,
+  roomId: null,
   worldSize: { width: defaultWorldSize, height: defaultWorldSize },
   players: [],
   food: [],
