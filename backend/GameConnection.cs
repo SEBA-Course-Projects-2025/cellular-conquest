@@ -71,7 +71,8 @@ public partial class Game
                         }
 
                         foreach (var cell in player.Cells) {
-                                float speed = 170f / (cell.Radius / 10f); // Larger radius → slower cell
+                                float baseSpeed = player.HasSpeedBoost ? 350f : 170f;
+                                float speed = baseSpeed / (cell.Radius / 10f); // Larger radius → slower cell
                                 Vector2 dir = Vector2.Normalize(player.Direction);
                                 if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
 

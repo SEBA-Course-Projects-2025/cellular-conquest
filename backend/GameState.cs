@@ -49,6 +49,11 @@ public partial class Game {
                         float newArea = currentArea + foodArea;
                         cell.Radius = MathF.Sqrt(newArea / MathF.PI);
                         
+                        if (food.IsSpeedBoost)
+                        {
+                            player.SpeedBoostUntil = DateTime.UtcNow.AddSeconds(5);
+                        }
+                        
                         break;
                     }
                 }
@@ -131,6 +136,7 @@ public partial class Game {
             id = p.Id,
             nickname = p.Nickname,
             score = p.Score,
+            boost = p.RemainingBoostSeconds,
             cells = p.Cells.Select(c => new {
                 x = c.Position.X,
                 y = c.Position.Y,
