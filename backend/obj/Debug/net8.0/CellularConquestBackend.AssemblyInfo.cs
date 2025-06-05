@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CellularConquestBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+74b01a9d3ba7f083b0f99fc5245bae4070032b12")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dd3525b4e5c1df2ec340649277aecbfa430cd437")]
 [assembly: System.Reflection.AssemblyProductAttribute("CellularConquestBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CellularConquestBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
