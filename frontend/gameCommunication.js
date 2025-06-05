@@ -99,3 +99,9 @@ export const sendSplitMessage = () => {
     );
   }
 };
+
+export const sendSpeedup = () => {
+  if (gameState.connected && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: "speedup" }));
+  }
+};

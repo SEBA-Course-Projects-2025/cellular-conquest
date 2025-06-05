@@ -1,4 +1,8 @@
-import { sendInput, sendSplitMessage } from "./gameCommunication.js";
+import {
+  sendInput,
+  sendSpeedup,
+  sendSplitMessage,
+} from "./gameCommunication.js";
 import gameState from "./gameState.js";
 
 export const canvas = document.getElementById("gameCanvas");
@@ -13,8 +17,32 @@ export const confirmExitBtn = document.getElementById("confirmExit");
 
 const deathPopup = document.getElementById("deathPopup");
 const finalScoreSpan = document.getElementById("finalScore");
-const restartGameBtn = document.getElementById("restartGame");
-const returnMenuBtn = document.getElementById("returnMenu");
+
+let speedupActive = false;
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Shift" && !speedupActive) {
+    sendSpeedup();
+    speedupActive = true;
+    setTimeout(() => {
+      speedupActive = false;
+    }, 1000);
+  }
+});
+
+export function updateSpeedBar(speedBars) {
+  document.getElementById("speedBarFill").style.width =
+    (speedBars / 5) * 100 + "%";
+}
+document.getElementById("roomId").addEventListener("click", () => {
+  navigator.clipboard.writeText(gameState.roomId).then(() => {
+    const popup = document.getElementById("copyPopup");
+    popup.style.top = "1rem";
+
+    setTimeout(() => {
+      popup.style.top = "-4rem";
+    }, 2000);
+  });
+});
 
 let currentScale = gameState.camera.scale;
 let lastRenderTime = performance.now();
