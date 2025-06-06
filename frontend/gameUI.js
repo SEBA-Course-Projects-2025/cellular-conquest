@@ -1,7 +1,7 @@
 import {
   sendInput,
-  sendSpeedup,
   sendSplitMessage,
+  sendSpeedup,
 } from "./gameCommunication.js";
 import gameState from "./gameState.js";
 
