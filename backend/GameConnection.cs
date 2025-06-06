@@ -49,15 +49,19 @@ public partial class Game
                             Direction = Vector2.Zero,
                             Score = 0
                         };
-                        visiblePlayers
-                        [player.Id] = player;
+                        Guid roomId = Guid.NewGuid();
+
+                        visiblePlayers[player.Id] = player;
 
                         //send playerData
                         var joinResponse = new
                         {
                             type = "playerData",
                             id = player.Id,
-                            nickname = player.Nickname
+                            nickname = player.Nickname,
+                            width = 2000,
+                            height = 2000,
+                            roomId = roomId,
                         };
                         await SendJson(player, joinResponse);
                         break;
@@ -69,15 +73,6 @@ public partial class Game
                             float y = obj?["direction"]?["y"]?.GetValue<float>() ?? 0f;
                             player.Direction = new Vector2(x, y);
                         }
-
-                        foreach (var cell in player.Cells) {
-                                float baseSpeed = player.HasSpeedBoost ? 350f : 170f;
-                                float speed = baseSpeed / (cell.Radius / 10f); // Larger radius → slower cell
-                                Vector2 dir = Vector2.Normalize(player.Direction);
-                                if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
-
-                                cell.Velocity = dir * speed;
-                            }
                         break;
 
                     case "split":
@@ -106,6 +101,20 @@ public partial class Game
                             player.Cells.AddRange(newCells);
                         }
                         break;
+
+                    case "speedup":
+                        if (player != null) {
+                            Console.WriteLine($"Speed boost is {player.SpeedBoostPoints}");
+                            if (player.SpeedBoostPoints > 0 )
+                            {
+                                // Console.WriteLine("Speed boost is", player.SpeedBoostPoints);
+                                player.SpeedBoostUntil = DateTime.UtcNow.AddSeconds(5);
+                                player.SpeedBoostPoints--;
+                            }
+                            Console.WriteLine($"[{player.Nickname}] Speed boost activated. Points: {player.SpeedBoostPoints}");
+                        }
+                        break;
+                        
 
                     case "leave":
                         if (player != null)

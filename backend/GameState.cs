@@ -19,14 +19,20 @@ public partial class Game {
         //cell movements
         foreach (var player in visiblePlayers.Values)
         {
-            foreach (var cell in player.Cells)
-            {
-                cell.Position += player.Direction * PlayerSpeed * deltaTime;
-                cell.Position = Vector2.Clamp(cell.Position, Vector2.Zero, new Vector2(WorldWidth, WorldHeight));
-                
+            foreach (var cell in player.Cells) {
+                float baseSpeed = player.HasSpeedBoost ? 450f : 300f;
+                float sizeFactor = cell.Radius / 15f;
+                float speed = baseSpeed / sizeFactor;
+
+                Vector2 dir = Vector2.Normalize(player.Direction);
+                if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
+
+                cell.Velocity = dir * speed;
+
                 cell.Position += cell.Velocity * deltaTime;
+                cell.Position = Vector2.Clamp(cell.Position, Vector2.Zero, new Vector2(WorldWidth, WorldHeight));
                 cell.Velocity *= 0.9f;
-            }      
+            }       
         }
         
 
@@ -51,7 +57,8 @@ public partial class Game {
                         
                         if (food.IsSpeedBoost)
                         {
-                            player.SpeedBoostUntil = DateTime.UtcNow.AddSeconds(5);
+                            player.SpeedBoostPoints = Math.Min(player.SpeedBoostPoints + 1, 5);
+                            Console.WriteLine("Boost is eaten");
                         }
                         
                         break;
@@ -142,7 +149,10 @@ public partial class Game {
                 y = c.Position.Y,
                 radius = c.Radius,
                 color = "#3d78dd"
-            }).ToList()
+            }).ToList(),
+            abilities = p.SpeedBoostPoints > 0 ? new {
+                speed = p.SpeedBoostPoints
+            } : null
         }).ToList();
 
 
