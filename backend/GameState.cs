@@ -70,11 +70,15 @@ public partial class Game {
             foreach (var food in eaten)
             {
                 foodItems.Remove(food);
+
+                bool isBoost = food.IsSpeedBoost; 
+
                 foodItems.Add(new Food
                 {
                     Position = new Vector2(rng.Next(0, WorldWidth), rng.Next(0, WorldHeight)),
-                    Radius = 5f,
-                    Color = "#3dda83"
+                    Radius = isBoost ? 9f : 5f,
+                    Color = isBoost ? "#00cfff" : "#3dda83",
+                    IsSpeedBoost = isBoost
                 });
             }
         }
