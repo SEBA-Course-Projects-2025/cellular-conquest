@@ -100,7 +100,11 @@ public partial class Game {
                             hunterCell.Radius = MathF.Sqrt(newArea / MathF.PI);
                             int points = (int)(preyArea / 35f);
                             hunter.Score += points;
-                            prey.Score = (prey.Score - points) < 0 ? 0 : prey.Score - points;
+                            if (prey.Cells.Count() > 1) {
+                                Console.WriteLine("here");
+                                prey.Score = (prey.Score - points) < 0 ? 0 : prey.Score - points;
+                            }
+                                
                             eatenCells.Add((prey, preyCell));
                         }
                     }
