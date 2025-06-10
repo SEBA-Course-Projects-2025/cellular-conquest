@@ -96,6 +96,8 @@ public partial class Game
 
                                     cell.Position -= offset;
                                     cell.Radius = splitRadius;
+
+                                    if (player.Cells.Count + newCells.Count == 16) break;
                                 }
                             }
                             player.Cells.AddRange(newCells);

@@ -20,9 +20,12 @@ public partial class Game {
         foreach (var player in visiblePlayers.Values)
         {
             foreach (var cell in player.Cells) {
-                float baseSpeed = player.HasSpeedBoost ? 450f : 300f;
-                float sizeFactor = cell.Radius / 15f;
-                float speed = baseSpeed / sizeFactor;
+                // float baseSpeed = player.HasSpeedBoost ? 450f : 300f;
+                // float sizeFactor = cell.Radius / 12f;
+                // float speed = baseSpeed / sizeFactor;
+                float speed = 300f / (cell.Radius / 20f);
+                if (player.HasSpeedBoost)
+                    speed *= 1.5f;
 
                 Vector2 dir = Vector2.Normalize(player.Direction);
                 if (float.IsNaN(dir.X) || float.IsNaN(dir.Y)) dir = Vector2.Zero;
@@ -88,16 +91,43 @@ public partial class Game {
         {
             foreach (var prey in visiblePlayers.Values)
             {
-                if (hunter.Id == prey.Id) continue; 
+                //united player
+                if (hunter.Id == prey.Id) {
+                    var merged = new List<(Cell, Cell)>();
 
-                foreach (var hunterCell in hunter.Cells)
-                {
-                    foreach (var preyCell in prey.Cells)
-                    {
+                    for (int i = 0; i < hunter.Cells.Count; i++) {
+                        for (int j = i + 1; j < hunter.Cells.Count; j++) {
+                            var cellA = hunter.Cells[i];
+                            var cellB = hunter.Cells[j];
+
+                            float distance = Vector2.Distance(cellA.Position, cellB.Position);
+                            if (distance < Math.Min(cellA.Radius, cellB.Radius)) {
+                                merged.Add((cellA, cellB));
+                            }
+                        }
+                    }
+
+                    foreach (var (cellA, cellB) in merged) {
+                        if (!hunter.Cells.Contains(cellA) || !hunter.Cells.Contains(cellB)) continue;
+
+                        float areaA = MathF.PI * cellA.Radius * cellA.Radius;
+                        float areaB = MathF.PI * cellB.Radius * cellB.Radius;
+                        float newArea = areaA + areaB;
+
+                        cellA.Radius = MathF.Sqrt(newArea / MathF.PI);
+                        cellA.Position = new Vector2(
+                            (cellA.Position.X * areaA + cellB.Position.X * areaB) / newArea,
+                            (cellA.Position.Y * areaA + cellB.Position.Y * areaB) / newArea
+                        );
+                        hunter.Cells.Remove(cellB);
+                    }
+                } 
+                //ordinar atack on another cell
+                foreach (var hunterCell in hunter.Cells) {
+                    foreach (var preyCell in prey.Cells) {
                         float distance = Vector2.Distance(hunterCell.Position, preyCell.Position);
                         if ((hunterCell.Radius > preyCell.Radius * 1.1f && distance < hunterCell.Radius && hunter.Cells.Count() == 1)
-                        || (hunterCell.Radius > preyCell.Radius * 1.33f && distance < hunterCell.Radius && hunter.Cells.Count() > 1))
-                        {
+                        || (hunterCell.Radius > preyCell.Radius * 1.33f && distance < hunterCell.Radius && hunter.Cells.Count() > 1)) {
                             float hunterArea = MathF.PI * hunterCell.Radius * hunterCell.Radius;
                             float preyArea = MathF.PI * preyCell.Radius * preyCell.Radius;
                             float newArea = hunterArea + preyArea;
@@ -105,7 +135,6 @@ public partial class Game {
                             int points = (int)(preyArea / 35f);
                             hunter.Score += points;
                             if (prey.Cells.Count() > 1) {
-                                Console.WriteLine("here");
                                 prey.Score = (prey.Score - points) < 0 ? 0 : prey.Score - points;
                             }
                                 
