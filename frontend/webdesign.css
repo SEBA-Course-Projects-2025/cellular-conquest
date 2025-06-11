@@ -278,6 +278,180 @@
     font-weight: bold;
     font-size: 1.1rem;
   }
+
+  .modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background-color: var(--panel-color);
+    margin: auto;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-50px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .close {
+    color: var(--text-light);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+  }
+
+  .close:hover {
+    color: var(--accent);
+  }
+
+  .modal h2 {
+    color: var(--accent);
+    margin-bottom: 1.5em;
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .modal h3 {
+    color: var(--text-light);
+    margin-bottom: 0.8em;
+    font-size: 1.2rem;
+  }
+
+  .room-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .action-group {
+    text-align: center;
+  }
+
+  .divider {
+    text-align: center;
+    color: var(--text-secondary);
+    font-weight: bold;
+    position: relative;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .divider::before {
+    left: 0;
+  }
+
+  .divider::after {
+    right: 0;
+  }
+
+  #roomCodeInput {
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(122, 255, 153, 0.3);
+    background: rgba(122, 255, 153, 0.1);
+    color: white;
+    width: 100%;
+    max-width: 200px;
+    transition: var(--transition);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  #roomCodeInput:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: var(--glow);
+  }
+
+  #createRoomBtn, #joinRoomBtn, #startGameBtn {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    background-color: var(--accent);
+    color: var(--bg-color);
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+    margin-top: 10px;
+  }
+
+  #createRoomBtn:hover, #joinRoomBtn:hover, #startGameBtn:hover {
+    background-color: #5df18b;
+    box-shadow: var(--glow);
+    transform: translateY(-2px);
+  }
+
+  .room-code-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(122, 255, 153, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(122, 255, 153, 0.3);
+  }
+
+  #displayRoomCode {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-shadow: var(--glow);
+  }
+
+  #copyCodeBtn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    background: rgba(160, 216, 255, 0.2);
+    color: var(--text-light);
+    border: 1px solid rgba(160, 216, 255, 0.3);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  #copyCodeBtn:hover {
+    background: rgba(160, 216, 255, 0.3);
+    transform: translateY(-1px);
+  }
   
   .particle {
     position: absolute;
@@ -307,5 +481,23 @@
     
     .actions-panel button {
       width: 100%;
+    }
+
+    .modal-content {
+      width: 95%;
+      padding: 20px;
+    }
+
+    .room-actions {
+      gap: 20px;
+    }
+
+    .room-code-display {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #displayRoomCode {
+      font-size: 1.5rem;
     }
   }
