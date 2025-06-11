@@ -15,6 +15,34 @@
     <input type="text" id="nicknameInput" placeholder="Enter your nickname" />
     <button id="loginBtn">Join Game</button>
   </div>
+  <div id="roomCodeModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>Join Teams Room</h2>
+      <div class="room-actions">
+        <div class="action-group">
+          <h3>Create New Room</h3>
+          <button id="createRoomBtn">Create Room</button>
+        </div>
+        <div class="divider">OR</div>
+        <div class="action-group">
+          <h3>Join Existing Room</h3>
+          <input type="text" id="roomCodeInput" placeholder="Enter room code" maxlength="8" />
+          <button id="joinRoomBtn">Join Room</button>
+        </div>
+      </div>
+      <div id="createdRoomInfo" style="display: none;">
+        <h3>Room Created!</h3>
+        <p>Share this code with your friends:</p>
+        <div class="room-code-display">
+          <span id="displayRoomCode"></span>
+          <button id="copyCodeBtn">Copy</button>
+        </div>
+        <button id="startGameBtn">Start Game</button>
+      </div>
+    </div>
+  </div>
+
   <div class="wrapper">
     <h1>Cellular Conquest</h1>
     <h2>Grow. Survive. Conquer.</h2>

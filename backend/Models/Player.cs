@@ -16,4 +16,5 @@ public class Player
     public bool HasSpeedBoost => SpeedBoostUntil.HasValue && SpeedBoostUntil.Value > DateTime.UtcNow;
     public int RemainingBoostSeconds => HasSpeedBoost ? (int)(SpeedBoostUntil.Value - DateTime.UtcNow).TotalSeconds : 0;
     public int SpeedBoostPoints { get; set; } = 0;
+    public Guid RoomId { get; set; }
 }
