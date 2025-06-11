@@ -34,36 +34,41 @@ public partial class Game
                 switch (type)
                 {
                     case "join":
-                        //Console.WriteLine("new player has joined");
-                        player = new Player
-                        {
+                        string? roomIdStr = obj?["roomId"]?.ToString();
+                        Guid roomId = string.IsNullOrWhiteSpace(roomIdStr) ? PublicRoomId : Guid.Parse(roomIdStr);
+                        
+                        player = new Player {
                             Id = Guid.NewGuid(),
                             Nickname = obj?["nickname"]?.ToString() ?? "Anonymous",
                             Socket = webSocket,
+                            RoomId = roomId,
                             Cells = new List<Cell> {
                                 new Cell {
                                     Position = new Vector2(500, 500),
                                     Radius = 20f
                                 }
-                            }, 
-                            Direction = Vector2.Zero,
-                            Score = 0
+                            }
                         };
-                        Guid roomId = Guid.NewGuid();
-
-                        visiblePlayers[player.Id] = player;
-
-                        //send playerData
-                        var joinResponse = new
+                        
+                        var roomPlayers = rooms.GetOrAdd(roomId, _ => new ConcurrentDictionary<Guid, Player>());
+                        roomPlayers[player.Id] = player;
+                        
+                        if (!roomFood.ContainsKey(roomId))
                         {
+                            SpawnFood(roomId, 100);
+                        }
+
+                        
+                        var joinResponse = new {
                             type = "playerData",
                             id = player.Id,
                             nickname = player.Nickname,
                             width = 2000,
                             height = 2000,
-                            roomId = roomId,
+                            roomId = roomId
                         };
                         await SendJson(player, joinResponse);
+
                         break;
 
                     case "input":
@@ -119,8 +124,19 @@ public partial class Game
                     case "leave":
                         if (player != null)
                         {
-                            visiblePlayers.TryRemove(player.Id, out _);
-                            Console.WriteLine($"Player {player.Nickname} left the game.");
+                            ConcurrentDictionary<Guid, Player> roomPlayers1;
+                            
+                            if (!rooms.TryGetValue(player.RoomId, out roomPlayers1))
+                            {
+                                roomPlayers1 = rooms.GetOrAdd(player.RoomId, _ => new ConcurrentDictionary<Guid, Player>());
+                            }
+
+                            roomPlayers1.TryRemove(player.Id, out _);
+
+                            if (roomPlayers1.IsEmpty && player.RoomId != PublicRoomId)
+                            {
+                                rooms.TryRemove(player.RoomId, out _);
+                            }
                         }
 
                         await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Player left", CancellationToken.None);
@@ -133,9 +149,13 @@ public partial class Game
                 break;
             }
         }
+        if (player != null && rooms.TryGetValue(player.RoomId, out var disconnectRoom))
+        {
+            disconnectRoom.TryRemove(player.Id, out _);
+            if (disconnectRoom.IsEmpty && player.RoomId != PublicRoomId)
+                rooms.TryRemove(player.RoomId, out _);
 
-        if (player != null)
-            visiblePlayers.TryRemove(player.Id, out _);
             Console.WriteLine($"Player {player?.Nickname} disconnected.");
+        }
     }
 }
