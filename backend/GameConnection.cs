@@ -126,7 +126,7 @@ public partial class Game
                     case "leave":
                         if (player != null)
                         {
-                            ConcurrentDictionary<Guid, Player> roomPlayers1;
+                            ConcurrentDictionary<Guid, Player>? roomPlayers1;
                             
                             if (!rooms.TryGetValue(player.RoomId, out roomPlayers1))
                             {
