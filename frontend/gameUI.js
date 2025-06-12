@@ -18,13 +18,12 @@ export const confirmExitBtn = document.getElementById("confirmExit");
 const deathPopup = document.getElementById("deathPopup");
 const finalScoreSpan = document.getElementById("finalScore");
 
-let speedupActive = false;
 window.addEventListener("keydown", (e) => {
-  if (e.key === "Shift" && !speedupActive) {
+  if (e.key === "Shift" && !gameState.speedupActive) {
     sendSpeedup();
-    speedupActive = true;
+    gameState.speedupActive = true;
     setTimeout(() => {
-      speedupActive = false;
+      gameState.speedupActive = false;
     }, 1000);
   }
 });
@@ -90,7 +89,8 @@ export const render = () => {
         cell.radius,
         cell.color,
         Date.now(),
-        player.id
+        player.id,
+        gameState.speedupActive && player.id === gameState.playerId
       );
 
       drawText(player.nickname, cell.x, cell.y, cell.radius, "white");
@@ -180,7 +180,6 @@ const drawGrid = () => {
         gridSize
     ) * gridSize;
 
-  // vertical lines
   for (let x = startX; x <= endX; x += gridSize) {
     if (x < 0 || x > gameState.worldSize.width) continue;
     ctx.beginPath();
@@ -189,7 +188,6 @@ const drawGrid = () => {
     ctx.stroke();
   }
 
-  // horizontal lines
   for (let y = startY; y <= endY; y += gridSize) {
     if (y < 0 || y > gameState.worldSize.height) continue;
     ctx.beginPath();
@@ -215,6 +213,8 @@ export function showDeathPopup(score) {
   gameState.inactive = true;
 }
 
+let lastMouseWorldPos = { x: 0, y: 0 };
+
 export const handleMouseMove = (event) => {
   const rect = canvas.getBoundingClientRect();
   const screenX = event.clientX - rect.left;
@@ -225,6 +225,7 @@ export const handleMouseMove = (event) => {
   const worldY =
     gameState.camera.y + (screenY - canvas.height / 2) / gameState.camera.scale;
 
+  lastMouseWorldPos = { x: worldX, y: worldY };
   sendInput({ x: worldX, y: worldY });
 };
 
@@ -242,7 +243,7 @@ function getMiddlePoint(p1, p2) {
   };
 }
 
-function drawWavyBlob(x, y, radius, color, timestamp, blobId) {
+function drawWavyBlob(x, y, radius, color, timestamp, blobId, isSpeeding) {
   const points = Math.max(8, Math.min(16, Math.floor(radius / 10)));
   const wobbleAmount = radius * 0.04;
   const wobbleSpeed = 0.008;
@@ -278,6 +279,32 @@ function drawWavyBlob(x, y, radius, color, timestamp, blobId) {
 
     point.x = x + adjustedRadius * point.baseX;
     point.y = y + adjustedRadius * point.baseY;
+  }
+
+  if (isSpeeding) {
+    const trailLength = 5;
+    const dx = lastMouseWorldPos.x - x;
+    const dy = lastMouseWorldPos.y - y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const directionX = distance > 0 ? -dx / distance : 0;
+    const directionY = distance > 0 ? -dy / distance : 0;
+
+    for (let i = 0; i < trailLength; i++) {
+      const t = 1 - i / trailLength;
+      const alpha = t * 0.3;
+      const size = radius * (0.5 + t * 0.5);
+      const offset = (i / trailLength) * radius * 1.5;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      drawCircle(
+        x + directionX * offset,
+        y + directionY * offset,
+        size,
+        color
+      );
+      ctx.restore();
+    }
   }
 
   ctx.fillStyle = color;

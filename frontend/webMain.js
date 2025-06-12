@@ -2,6 +2,10 @@ const API_BASE = "/api/player";
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".wrapper").style.display = "none";
   const loginScreen = document.getElementById("loginScreen");
+  const nicknameInput = document.getElementById("nicknameInput");
+  if (localStorage.getItem("playerName")){
+    nicknameInput.placeholder = localStorage.getItem("playerName");
+  }
   const loginBtn = document.getElementById("loginBtn");
   const roomCodeModal = document.getElementById("roomCodeModal");
   const closeModal = document.getElementById("closeModal");
@@ -12,10 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const displayRoomCode = document.getElementById("displayRoomCode");
   const copyCodeBtn = document.getElementById("copyCodeBtn");
   const startGameBtn = document.getElementById("startGameBtn");
-  const nicknameInput = document.getElementById("nicknameInput");
-  if (localStorage.getItem("playerName")){
-    nicknameInput.placeholder = localStorage.getItem("playerName");
-  }
   let socket = null;
   let nickname = "";
   let currentRoomId = null;
@@ -160,9 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     roomCodeModal.style.display = "none";
     resetModal();
-    window.location.href = `gamePage.html?nickname=${encodeURIComponent(
-      nickname
-    )}&mode=teams&roomId=${currentRoomId}`;
+    window.location.href = `gamePage.html`;
   }
   const modeButtons = document.querySelectorAll(".mode-btn");
   let selectedMode = "ffa";

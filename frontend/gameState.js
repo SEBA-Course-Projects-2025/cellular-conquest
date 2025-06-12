@@ -10,6 +10,7 @@ const state = {
   food: [],
   lastTimestamp: null,
   dt: null,
+  speedupActive: false,
   inactive: false,
   connected: false,
   camera: { x: defaultWorldSize / 2, y: defaultWorldSize / 2, scale: 1 },
