@@ -2,7 +2,6 @@ const API_BASE = "/api/player";
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".wrapper").style.display = "none";
   const loginScreen = document.getElementById("loginScreen");
-  const nicknameInput = document.getElementById("nicknameInput");
   const loginBtn = document.getElementById("loginBtn");
   const roomCodeModal = document.getElementById("roomCodeModal");
   const closeModal = document.getElementById("closeModal");
@@ -13,6 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const displayRoomCode = document.getElementById("displayRoomCode");
   const copyCodeBtn = document.getElementById("copyCodeBtn");
   const startGameBtn = document.getElementById("startGameBtn");
+  const nicknameInput = document.getElementById("nicknameInput");
+  if (localStorage.getItem("playerName")){
+    nicknameInput.placeholder = localStorage.getItem("playerName");
+  }
   let socket = null;
   let nickname = "";
   let currentRoomId = null;
@@ -39,21 +42,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const isValidGuid = /^[A-F0-9]{8}-([A-F0-9]{4}-){3}[A-F0-9]{12}$/.test(e.target.value);
     
-    console.log("Guid valid: ", isValidGuid);
-    if (!isValidGuid) {
-      // show warning, highlight input, etc.
-    }
   });
   roomCodeInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") joinRoom();
   });
   function tryLogin() {
-    nickname = nicknameInput.value.trim();
+    nickname = nicknameInput.value.trim() || localStorage.getItem("playerName");
     if (!nickname) {
       alert("Please enter a nickname!");
       nicknameInput.focus();
       return;
     }
+    localStorage.setItem("playerName",nickname);
     startGame(nickname);
   }
   function getWsHost() {
@@ -219,130 +219,4 @@ document.addEventListener("DOMContentLoaded", function () {
       resetModal();
     }
   });
-  function updateGameState(players) {
-    document.querySelectorAll(".player").forEach((el) => el.remove());
-    players.forEach((player) => {
-      const cell = player.cells && player.cells[0];
-      let el = document.createElement("div");
-      el.className = "player";
-      el.style.position = "absolute";
-      el.style.left = (cell?.x || player.position?.x || 0) + "px";
-      el.style.top = (cell?.y || player.position?.y || 0) + "px";
-      el.textContent = `${player.nickname} (${player.score})`;
-      document.body.appendChild(el);
-    });
-  }
-  let direction = { x: 0, y: 0 };
-  window.addEventListener("keydown", (e) => {
-    switch (e.key) {
-      case "ArrowUp":
-        direction.y = -1;
-        break;
-      case "ArrowDown":
-        direction.y = 1;
-        break;
-      case "ArrowLeft":
-        direction.x = -1;
-        break;
-      case "ArrowRight":
-        direction.x = 1;
-        break;
-      default:
-        return;
-    }
-    sendPlayerInput(direction);
-  });
-  window.addEventListener("keyup", (e) => {
-    switch (e.key) {
-      case "ArrowUp":
-      case "ArrowDown":
-        direction.y = 0;
-        break;
-      case "ArrowLeft":
-      case "ArrowRight":
-        direction.x = 0;
-        break;
-      default:
-        return;
-    }
-    sendPlayerInput(direction);
-  });
-  function sendPlayerInput(direction) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: "input", direction }));
-    }
-  }
-  function playSound(type) {
-    console.log(`Playing ${type} sound`);
-  }
-  createParticles();
-  function createParticles() {
-    const particleCount = window.innerWidth < 600 ? 30 : 50;
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement("div");
-      particle.classList.add("particle");
-      const size = Math.random() * 5 + 1;
-      const posX = Math.random() * window.innerWidth;
-      const posY = Math.random() * window.innerHeight;
-      const opacity = Math.random() * 0.5 + 0.1;
-      const duration = Math.random() * 20 + 10;
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.left = `${posX}px`;
-      particle.style.top = `${posY}px`;
-      particle.style.opacity = opacity;
-      particle.style.position = "fixed";
-      particle.style.borderRadius = "50%";
-      particle.style.background = "white";
-      particle.style.pointerEvents = "none";
-      particle.style.animation = `float ${duration}s linear infinite`;
-      particle.style.animationDelay = `${Math.random() * 20}s`;
-      document.body.appendChild(particle);
-    }
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes float {
-        0%   { transform: translateY(0) translateX(0); opacity: 0.5; }
-        50%  { transform: translateY(-100px) translateX(50px); opacity: 0.3; }
-        100% { transform: translateY(-200px) translateX(0); opacity: 0; }
-      }
-      .player {
-        background: #3498db;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-family: sans-serif;
-        font-size: 12px;
-        user-select: none;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  const levelElement = document.querySelector(".level");
-  let currentLevel = levelElement
-    ? parseInt(levelElement.textContent.replace("Level ", ""))
-    : 1;
-  setTimeout(() => {
-    levelUp();
-  }, 5000);
-  function levelUp() {
-    currentLevel++;
-    if (levelElement) levelElement.textContent = `Level ${currentLevel}`;
-    if (levelElement) levelElement.classList.add("level-up");
-    setTimeout(() => {
-      if (levelElement) levelElement.classList.remove("level-up");
-    }, 1000);
-  }
-  const levelUpStyle = document.createElement("style");
-  levelUpStyle.textContent = `
-    .level-up {
-      animation: levelUp 0.5s ease-out;
-    }
-    @keyframes levelUp {
-      0%   { transform: scale(1);   color: var(--text-secondary); }
-      50%  { transform: scale(1.3); color: var(--accent); }
-      100% { transform: scale(1);   color: var(--text-secondary); }
-    }
-  `;
-  document.head.appendChild(levelUpStyle);
-});
+})
