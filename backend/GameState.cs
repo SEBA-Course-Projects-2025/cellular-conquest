@@ -96,12 +96,39 @@ public partial class Game {
             {
                 foreach (var prey in players.Values)
                 {
-                    if (hunter.Id == prey.Id) continue;
+                    if (hunter.Id == prey.Id) {
+                    var merged = new List<(Cell, Cell)>();
 
-                    foreach (var hunterCell in hunter.Cells)
-                    {
-                        foreach (var preyCell in prey.Cells)
-                        {
+                    for (int i = 0; i < hunter.Cells.Count; i++) {
+                        for (int j = i + 1; j < hunter.Cells.Count; j++) {
+                            var cellA = hunter.Cells[i];
+                            var cellB = hunter.Cells[j];
+
+                            float distance = Vector2.Distance(cellA.Position, cellB.Position);
+                            if (distance < Math.Min(cellA.Radius, cellB.Radius)) {
+                                merged.Add((cellA, cellB));
+                            }
+                        }
+                    }
+
+                    foreach (var (cellA, cellB) in merged) {
+                        if (!hunter.Cells.Contains(cellA) || !hunter.Cells.Contains(cellB)) continue;
+
+                        float areaA = MathF.PI * cellA.Radius * cellA.Radius;
+                        float areaB = MathF.PI * cellB.Radius * cellB.Radius;
+                        float newArea = areaA + areaB;
+
+                        cellA.Radius = MathF.Sqrt(newArea / MathF.PI);
+                        cellA.Position = new Vector2(
+                            (cellA.Position.X * areaA + cellB.Position.X * areaB) / newArea,
+                            (cellA.Position.Y * areaA + cellB.Position.Y * areaB) / newArea
+                        );
+                        hunter.Cells.Remove(cellB);
+                    }
+                } 
+                //ordinar atack on another cell
+                foreach (var hunterCell in hunter.Cells) {
+                    foreach (var preyCell in prey.Cells) {
                             float distance = Vector2.Distance(hunterCell.Position, preyCell.Position);
                             if ((hunterCell.Radius > preyCell.Radius * 1.1f && distance < hunterCell.Radius &&
                                  hunter.Cells.Count() == 1)
