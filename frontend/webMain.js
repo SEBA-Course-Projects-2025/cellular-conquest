@@ -1,3 +1,4 @@
+function playSound() {}
 const API_BASE = "/api/player";
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".wrapper").style.display = "none";

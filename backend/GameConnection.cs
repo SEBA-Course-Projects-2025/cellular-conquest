@@ -35,31 +35,59 @@ public partial class Game
                 {
                     case "join":
                         string? roomIdStr = obj?["roomId"]?.ToString();
-                        Guid roomId = string.IsNullOrWhiteSpace(roomIdStr) ? PublicRoomId : Guid.Parse(roomIdStr);
-                        
-                        player = new Player {
+                        string? privateServer = obj?["privateServer"]?.ToString();
+                        Guid roomId;
+
+                        if (!string.IsNullOrWhiteSpace(privateServer))
+                        {
+                            if (privateServer == "true")
+                            {
+                                roomId = Guid.NewGuid();
+                            }
+                            else if (Guid.TryParse(privateServer, out var parsedGuid))
+                            {
+                                roomId = parsedGuid;
+                            }
+                            else
+                            {
+                                roomId = PublicRoomId;
+                            }
+                        }
+                        else if (!string.IsNullOrWhiteSpace(roomIdStr) && Guid.TryParse(roomIdStr, out var joinGuid))
+                        {
+                            roomId = joinGuid;
+                        }
+                        else
+                        {
+                            roomId = PublicRoomId;
+                        }
+
+                        player = new Player
+                        {
                             Id = Guid.NewGuid(),
                             Nickname = obj?["nickname"]?.ToString() ?? "Anonymous",
                             Socket = webSocket,
                             RoomId = roomId,
-                            Cells = new List<Cell> {
-                                new Cell {
+                            Cells = new List<Cell>
+                            {
+                                new Cell
+                                {
                                     Position = new Vector2(500, 500),
                                     Radius = 20f
                                 }
                             }
                         };
-                        
+
                         var roomPlayers = rooms.GetOrAdd(roomId, _ => new ConcurrentDictionary<Guid, Player>());
                         roomPlayers[player.Id] = player;
-                        
+
                         if (!roomFood.ContainsKey(roomId))
                         {
                             SpawnFood(roomId, 100);
                         }
-
                         
-                        var joinResponse = new {
+                        var joinResponse = new
+                        {
                             type = "playerData",
                             id = player.Id,
                             nickname = player.Nickname,
@@ -70,6 +98,7 @@ public partial class Game
                         await SendJson(player, joinResponse);
 
                         break;
+                
 
                     case "input":
                         if (player != null)
