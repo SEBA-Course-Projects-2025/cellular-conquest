@@ -20,6 +20,8 @@ export const handlePlayerData = (data) => {
   gameState.playerId = data.id;
   gameState.playerName = data.nickname;
   gameState.roomId = data.roomId;
+  if (data.currentImages !== undefined)
+    gameState.playersSkins = data.currentImages;
   if (data.width !== undefined) gameState.worldSize.width = data.width;
   if (data.height !== undefined) gameState.worldSize.height = data.height;
 

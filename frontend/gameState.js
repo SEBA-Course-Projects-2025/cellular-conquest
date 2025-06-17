@@ -14,6 +14,20 @@ const state = {
   inactive: false,
   connected: false,
   camera: { x: defaultWorldSize / 2, y: defaultWorldSize / 2, scale: 1 },
+  customSkin: localStorage.getItem("customSkin") || null,
+  availableSkins: localStorage.getItem("availableSkins") || [],
+  playersSkins: [],
+
+  updatePlayerSkin(id, image) {
+    const player = this.playersSkins.find((p) => p.id === id);
+    if (!player) {
+      this.playersSkins.push({ id: id, skin: image });
+    }
+    player.skin = image;
+  },
+  removePlayerSkin(id) {
+    this.playersSkins = this.playersSkins.filter((p) => p.id !== id);
+  },
 };
 
 export default state;
