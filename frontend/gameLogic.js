@@ -22,6 +22,10 @@ export const handlePlayerData = (data) => {
   gameState.roomId = data.roomId;
   if (data.currentImages !== undefined)
     gameState.playersSkins = data.currentImages;
+  gameState.updatePlayerSkin(
+    gameState.playerId,
+    localStorage.getItem("customSkin")
+  );
   if (data.width !== undefined) gameState.worldSize.width = data.width;
   if (data.height !== undefined) gameState.worldSize.height = data.height;
 

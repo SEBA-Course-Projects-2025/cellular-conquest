@@ -33,8 +33,9 @@ export const connectToServer = () => {
       joinMessage.privateServer = privateRoomId;
     }
 
-    if (gameState.customSkin) {
-      joinMessage.customSkin = gameState.customSkin;
+    const customSkin = localStorage.getItem("customSkin");
+    if (customSkin) {
+      joinMessage.customSkin = customSkin;
     }
 
     socket.send(JSON.stringify(joinMessage));
@@ -60,7 +61,7 @@ export const connectToServer = () => {
         gameState.updatePlayerSkin(message.id, message.image);
         break;
       case "playerDisconnected":
-        gameState.removePlayerSkin(message.id);
+        gameState.updatePlayerSkin(message.id);
         break;
       case "error":
         handleError(message.message || "An error occurred");
