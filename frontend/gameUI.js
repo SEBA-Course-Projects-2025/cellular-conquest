@@ -23,15 +23,14 @@ const skinImageCache = new Map();
 function getSkinImage(playerId) {
   const skinEntry = gameState.playersSkins.find((p) => p.id === playerId);
   if (!skinEntry) return null;
-
   let base64;
-  if (typeof skinEntry.image === "number") {
+  if (typeof skinEntry.skin === "number") {
     const available = gameState.availableSkins.find(
-      (s) => s.id === skinEntry.image
+      (s) => s.id === skinEntry.skin
     );
-    base64 = available?.image;
+    base64 = available?.skin;
   } else {
-    base64 = skinEntry.image;
+    base64 = skinEntry.skin;
   }
 
   if (!base64) return null;
