@@ -2,6 +2,7 @@ import {
   sendInput,
   sendSplitMessage,
   sendSpeedup,
+  sendFeedMessage,
 } from "./gameCommunication.js";
 import gameState from "./gameState.js";
 
@@ -50,6 +51,8 @@ window.addEventListener("keydown", (e) => {
     setTimeout(() => {
       gameState.speedupActive = false;
     }, 1000);
+  } else if (e.key == "w") {
+    sendFeedMessage();
   }
 });
 
