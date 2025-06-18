@@ -91,9 +91,8 @@ export const sendInput = (mousePosition) => {
   if (!isReady()) return;
   const player = gameState.players.find((p) => p.id === gameState.playerId);
   if (!player || player.cells.length === 0) return;
-  const playerCell = player.cells[0]; // todo: calculate average
-  const dx = mousePosition.x - playerCell.x;
-  const dy = mousePosition.y - playerCell.y;
+  const dx = mousePosition.x - gameState.camera.x;
+  const dy = mousePosition.y - gameState.camera.y;
   const length = Math.sqrt(dx * dx + dy * dy);
   const normalizedDx = length > 0 ? dx / length : 0;
   const normalizedDy = length > 0 ? dy / length : 0;
