@@ -44,7 +44,11 @@ function getSkinImage(playerId) {
 }
 
 window.addEventListener("keydown", (e) => {
-  if (e.key === "Shift" && !gameState.speedupActive) {
+  if (
+    e.key === "Shift" &&
+    !gameState.speedupActive &&
+    gameState.speedupAvailable
+  ) {
     sendSpeedup();
     gameState.speedupActive = true;
     setTimeout(() => {

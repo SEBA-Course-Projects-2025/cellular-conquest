@@ -47,6 +47,7 @@ export const handleGameState = (data) => {
       gameState.playerScore
     )}`;
     updateSpeedBar(player.abilities?.speed ?? 0);
+    gameState.speedupAvailable = !!player.abilities?.speed;
 
     const cellsCount = player.cells.length;
     if (cellsCount > 0) {
